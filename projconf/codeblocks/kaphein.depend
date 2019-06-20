@@ -1,0 +1,241 @@
+# depslib dependency file v1.0
+1540668914 source:e:\hyw793\projects\kaphein\src\kaphein\byteorder.c
+	"kaphein/byteOrder.h"
+
+1540668707 e:\hyw793\projects\kaphein\include\kaphein\byteorder.h
+	"kaphein/def.h"
+
+1542461827 e:\hyw793\projects\kaphein\include\kaphein\def.h
+	"config.h"
+	<stddef.h>
+	<stdbool.h>
+	<stdint.h>
+	<cstddef>
+	<stdint.h>
+
+1542520726 e:\hyw793\projects\kaphein\include\kaphein\config.h
+	"compconst.h"
+
+1540657139 e:\hyw793\projects\kaphein\include\kaphein\compconst.h
+
+1542519736 source:e:\hyw793\projects\kaphein\src\kaphein\coll\list.c
+	"kaphein/ErrorCode.h"
+	"kaphein/mem/utils.h"
+	"kaphein/coll/List.h"
+
+1542454932 e:\hyw793\projects\kaphein\include\kaphein\errorcode.h
+	"kaphein/def.h"
+
+1541262355 e:\hyw793\projects\kaphein\include\kaphein\mem\utils.h
+	"kaphein/def.h"
+
+1541263023 e:\hyw793\projects\kaphein\include\kaphein\coll\list.h
+	"Iterable.h"
+
+1541262305 e:\hyw793\projects\kaphein\include\kaphein\coll\iterable.h
+	"def.h"
+	"kaphein/mem/Allocator.h"
+
+1540567098 e:\hyw793\projects\kaphein\include\kaphein\coll\def.h
+	"kaphein/def.h"
+
+1540709104 e:\hyw793\projects\kaphein\include\kaphein\mem\allocator.h
+	"kaphein/ErrorCode.h"
+
+1540640886 source:e:\hyw793\projects\kaphein\src\kaphein\copyable.c
+	"kaphein/ErrorCode.h"
+	"kaphein/Copyable.h"
+
+1540639390 e:\hyw793\projects\kaphein\include\kaphein\copyable.h
+	"kaphein/def.h"
+
+1541263358 source:e:\hyw793\projects\kaphein\src\kaphein\errorcode.c
+	"kaphein/internal.h"
+	"kaphein/ErrorCode.h"
+
+1540707822 e:\hyw793\projects\kaphein\include\kaphein\internal.h
+	"kaphein/def.h"
+
+1541307175 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\aabb.c
+	"kaphein/ErrorCode.h"
+	"kaphein/geom3d/Vector3_internal.h"
+	"kaphein/geom3d/Aabb.h"
+
+1541305058 e:\hyw793\projects\kaphein\include\kaphein\geom3d\vector3_internal.h
+
+1541306862 e:\hyw793\projects\kaphein\include\kaphein\geom3d\aabb.h
+	"Vector3.h"
+
+1542006869 e:\hyw793\projects\kaphein\include\kaphein\geom3d\vector3.h
+	"def.h"
+
+1541310834 e:\hyw793\projects\kaphein\include\kaphein\geom3d\def.h
+	"kaphein/def.h"
+
+1541308912 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\capsule.c
+	"kaphein/geom3d/Capsule.h"
+
+1541308871 e:\hyw793\projects\kaphein\include\kaphein\geom3d\capsule.h
+	"Ray.h"
+
+1541308967 e:\hyw793\projects\kaphein\include\kaphein\geom3d\ray.h
+	"Vector3.h"
+
+1542007280 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\matrix4x4.c
+	"kaphein/mem/utils.h"
+	"kaphein/geom3d/Matrix4x4.h"
+
+1542006989 e:\hyw793\projects\kaphein\include\kaphein\geom3d\matrix4x4.h
+	"kaphein/geom3d/Vector4.h"
+
+1542006874 e:\hyw793\projects\kaphein\include\kaphein\geom3d\vector4.h
+	"def.h"
+
+1541311734 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\quaternion_internal.c
+	"kaphein/math/scalar.h"
+	"kaphein/geom3d/Vector3.h"
+	"kaphein/geom3d/Vector3_internal.h"
+	"kaphein/geom3d/Vector4.h"
+	"kaphein/geom3d/Vector4_internal.h"
+	"kaphein/geom3d/Quaternion.h"
+	"kaphein/geom3d/Quaternion_internal.h"
+
+1542006942 e:\hyw793\projects\kaphein\include\kaphein\math\scalar.h
+	"kaphein/def.h"
+
+1541305169 e:\hyw793\projects\kaphein\include\kaphein\geom3d\vector4_internal.h
+
+1542006945 e:\hyw793\projects\kaphein\include\kaphein\geom3d\quaternion.h
+	"Vector3.h"
+
+1542006945 e:\hyw793\projects\kaphein\include\kaphein\geom3d\quaternion_internal.h
+	"kaphein/def.h"
+
+1541308986 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\ray.c
+	"kaphein/geom3d/Vector3_internal.h"
+	"kaphein/geom3d/Ray.h"
+
+1541305083 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\vector3.c
+	"kaphein/geom3d/Vector3.h"
+	"kaphein/geom3d/Vector3_internal.h"
+
+1541684471 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\vector3_internal.c
+	"kaphein/math/scalar.h"
+	"kaphein/geom3d/Vector3_internal.h"
+
+1541305180 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\vector4.c
+	"kaphein/geom3d/Vector4.h"
+	"kaphein/geom3d/Vector4_internal.h"
+
+1541311645 source:e:\hyw793\projects\kaphein\src\kaphein\geom3d\vector4_internal.c
+	"kaphein/math/scalar.h"
+	"kaphein/geom3d/Vector4_internal.h"
+
+1540707954 source:e:\hyw793\projects\kaphein\src\kaphein\internal.c
+	"kaphein/def.h"
+	<string.h>
+	"kaphein/ErrorCode.h"
+	"kaphein/internal.h"
+
+1541260358 source:e:\hyw793\projects\kaphein\src\kaphein\math\geom3d\quaternion.c
+	"kaphein/geom3d/Vector4_internal.h"
+	"kaphein/geom3d/Quaternion.h"
+	"kaphein/geom3d/Quaternion_internal.h"
+
+1541311767 source:e:\hyw793\projects\kaphein\src\kaphein\math\scalar.c
+	"kaphein/def.h"
+	<math.h>
+	"kaphein/math/scalar.h"
+	<float.h>
+
+1542459209 source:e:\hyw793\projects\kaphein\src\kaphein\mem\_segmentpool.c
+	"kaphein/ErrorCode.h"
+	"kaphein/mem/utils.h"
+	"kaphein/mem/SegmentPool.h"
+
+1540713219 e:\hyw793\projects\kaphein\include\kaphein\mem\segmentpool.h
+	"kaphein/def.h"
+
+1542459201 source:e:\hyw793\projects\kaphein\src\kaphein\mem\allocator.c
+	"kaphein/def.h"
+	<stdlib.h>
+	"kaphein/ErrorCode.h"
+	"kaphein/mem/Allocator.h"
+
+1542512972 source:e:\hyw793\projects\kaphein\src\kaphein\mem\segmentpool.c
+	"kaphein/ErrorCode.h"
+	"kaphein/mem/SegmentPool.h"
+
+1540708066 source:e:\hyw793\projects\kaphein\src\kaphein\mem\utils.c
+	"kaphein/ErrorCode.h"
+	"kaphein/internal.h"
+	"kaphein/mem/utils.h"
+
+1541261944 source:e:\hyw793\projects\kaphein\src\kaphein\test\geom3test.c
+	<stdlib.h>
+	<stdio.h>
+	<kaphein/geom3d/Vector3.h>
+	"kaphein/test/geom3dTest.h"
+
+1541221737 e:\hyw793\projects\kaphein\include\kaphein\test\geom3dtest.h
+
+1541221854 source:e:\hyw793\projects\kaphein\src\kaphein\test\segmentpooltest.c
+	<stdio.h>
+	<stdlib.h>
+	<kaphein/mem/Allocator.h>
+	<kaphein/mem/utils.h>
+	<kaphein/mem/SegmentPool.h>
+	"kaphein/test/SegmentPoolTest.h"
+
+1541221818 e:\hyw793\projects\kaphein\include\kaphein\test\segmentpooltest.h
+
+1542519708 source:e:\hyw793\projects\kaphein\src\kaphein\text\encoding.c
+	"kaphein/ErrorCode.h"
+	"kaphein/text/encoding.h"
+
+1542006942 e:\hyw793\projects\kaphein\include\kaphein\text\encoding.h
+	"kaphein/def.h"
+
+1540665206 source:e:\hyw793\projects\kaphein\src\kaphein\thrd\internal.c
+	"kaphein/def.h"
+	<time.h>
+	"kaphein/ErrorCode.h"
+	"kaphein/thrd/internal.h"
+
+1541263082 e:\hyw793\projects\kaphein\include\kaphein\thrd\internal.h
+	"kaphein/def.h"
+	<Windows.h>
+	<unistd.h>
+	<Windows.h>
+	<pthread.h>
+	"kaphein/thrd/Mutex.h"
+
+1542006942 e:\hyw793\projects\kaphein\include\kaphein\thrd\mutex.h
+	"kaphein/def.h"
+
+1541263038 source:e:\hyw793\projects\kaphein\src\kaphein\thrd\mutex.c
+	"kaphein/ErrorCode.h"
+	"kaphein/thrd/internal.h"
+	"kaphein/thrd/Mutex.h"
+
+1541263073 source:e:\hyw793\projects\kaphein\src\kaphein\thrd\resetevent.c
+	"kaphein/ErrorCode.h"
+	"kaphein/thrd/internal.h"
+	"kaphein/thrd/ResetEvent.h"
+
+1541263009 e:\hyw793\projects\kaphein\include\kaphein\thrd\resetevent.h
+	"kaphein/def.h"
+
+1540661376 source:e:\hyw793\projects\kaphein\src\kaphein\thrd\threadpool.c
+
+1540663611 source:e:\hyw793\projects\kaphein\src\kaphein\thrd\utils.c
+	"kaphein/ErrorCode.h"
+	"kaphein/thrd/internal.h"
+	"kaphein/thrd/utils.h"
+
+1540659934 e:\hyw793\projects\kaphein\include\kaphein\thrd\utils.h
+	"kaphein/def.h"
+
+1541221880 source:e:\hyw793\projects\kaphein\src\main.c
+	"kaphein/test/geom3dTest.h"
+

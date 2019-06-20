@@ -1,0 +1,724 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="include" displayName="include" projectFiles="true">
+      <logicalFolder name="kaphein" displayName="kaphein" projectFiles="true">
+        <logicalFolder name="coll" displayName="coll" projectFiles="true">
+          <itemPath>../../../include/kaphein/coll/ByteBuffer.h</itemPath>
+          <itemPath>../../../include/kaphein/coll/Iterable.h</itemPath>
+          <itemPath>../../../include/kaphein/coll/List.h</itemPath>
+          <itemPath>../../../include/kaphein/coll/def.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="geom3d" displayName="geom3d" projectFiles="true">
+          <itemPath>../../../include/kaphein/geom3d/Aabb.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Capsule.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Matrix4x4.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Obb.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Quaternion.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Quaternion_internal.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Ray.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/RaycastHit.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Sphere.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Vector3.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Vector3_internal.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Vector4.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/Vector4_internal.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/def.h</itemPath>
+          <itemPath>../../../include/kaphein/geom3d/raycast.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="math" displayName="math" projectFiles="true">
+          <itemPath>../../../include/kaphein/math/Processor.h</itemPath>
+          <itemPath>../../../include/kaphein/math/matrix.h</itemPath>
+          <itemPath>../../../include/kaphein/math/scalar.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="mem" displayName="mem" projectFiles="true">
+          <itemPath>../../../include/kaphein/mem/Allocator.h</itemPath>
+          <itemPath>../../../include/kaphein/mem/SegmentPool.h</itemPath>
+          <itemPath>../../../include/kaphein/mem/utils.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="text" displayName="text" projectFiles="true">
+          <itemPath>../../../include/kaphein/text/JsonSerializable.h</itemPath>
+          <itemPath>../../../include/kaphein/text/encoding.h</itemPath>
+        </logicalFolder>
+        <logicalFolder name="thrd" displayName="thrd" projectFiles="true">
+          <itemPath>../../../include/kaphein/thrd/Mutex.h</itemPath>
+          <itemPath>../../../include/kaphein/thrd/ResetEvent.h</itemPath>
+          <itemPath>../../../include/kaphein/thrd/ThreadPool.h</itemPath>
+          <itemPath>../../../include/kaphein/thrd/internal.h</itemPath>
+          <itemPath>../../../include/kaphein/thrd/utils.h</itemPath>
+        </logicalFolder>
+        <itemPath>../../../include/kaphein/Copyable.h</itemPath>
+        <itemPath>../../../include/kaphein/ErrorCode.h</itemPath>
+        <itemPath>../../../include/kaphein/byteOrder.h</itemPath>
+        <itemPath>../../../include/kaphein/compconst.h</itemPath>
+        <itemPath>../../../include/kaphein/config.h</itemPath>
+        <itemPath>../../../include/kaphein/def.h</itemPath>
+        <itemPath>../../../include/kaphein/internal.h</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="src" displayName="src" projectFiles="true">
+      <logicalFolder name="kaphein" displayName="kaphein" projectFiles="true">
+        <logicalFolder name="coll" displayName="coll" projectFiles="true">
+          <itemPath>../../../src/kaphein/coll/ByteBuffer.c</itemPath>
+          <itemPath>../../../src/kaphein/coll/List.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="geom3d" displayName="geom3d" projectFiles="true">
+          <itemPath>../../../src/kaphein/geom3d/Aabb.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Capsule.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Matrix4x4.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Quaternion_internal.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Ray.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Vector3.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Vector3_internal.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Vector4.c</itemPath>
+          <itemPath>../../../src/kaphein/geom3d/Vector4_internal.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="math" displayName="math" projectFiles="true">
+          <logicalFolder name="geom3d" displayName="geom3d" projectFiles="true">
+            <itemPath>../../../src/kaphein/math/geom3d/Quaternion.c</itemPath>
+          </logicalFolder>
+          <itemPath>../../../src/kaphein/math/scalar.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="mem" displayName="mem" projectFiles="true">
+          <itemPath>../../../src/kaphein/mem/Allocator.c</itemPath>
+          <itemPath>../../../src/kaphein/mem/SegmentPool.c</itemPath>
+          <itemPath>../../../src/kaphein/mem/utils.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="text" displayName="text" projectFiles="true">
+          <itemPath>../../../src/kaphein/text/encoding.c</itemPath>
+        </logicalFolder>
+        <logicalFolder name="thrd" displayName="thrd" projectFiles="true">
+          <itemPath>../../../src/kaphein/thrd/Mutex.c</itemPath>
+          <itemPath>../../../src/kaphein/thrd/ResetEvent.c</itemPath>
+          <itemPath>../../../src/kaphein/thrd/ThreadPool.c</itemPath>
+          <itemPath>../../../src/kaphein/thrd/internal.c</itemPath>
+          <itemPath>../../../src/kaphein/thrd/utils.c</itemPath>
+        </logicalFolder>
+        <itemPath>../../../src/kaphein/Copyable.c</itemPath>
+        <itemPath>../../../src/kaphein/ErrorCode.c</itemPath>
+        <itemPath>../../../src/kaphein/byteOrder.c</itemPath>
+        <itemPath>../../../src/kaphein/internal.c</itemPath>
+      </logicalFolder>
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>../../../include</Elem>
+    <Elem>../../../src</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="2">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>true</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <commandlineTool>gcc</commandlineTool>
+          <incDir>
+            <pElem>../../../include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>KAPHEIN_COMPOPT_DLL_API_MODE=1</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_MODE=0</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_VALUE=KAPHEIN_THREAD_MODEL_PTHREAD</Elem>
+          </preprocessorList>
+          <warningLevel>2</warningLevel>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>../../../include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>KAPHEIN_COMPOPT_DLL_API_MODE=1</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_MODE=0</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_VALUE=KAPHEIN_THREAD_MODEL_PTHREAD</Elem>
+          </preprocessorList>
+          <warningLevel>2</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <warningLevel>2</warningLevel>
+        </fortranCompilerTool>
+        <asmTool>
+          <warningLevel>2</warningLevel>
+        </asmTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_PLATFORM}/${CND_CONF}/kaphein.${CND_DLIB_EXT}</output>
+          <linkerCopySharedLibs>true</linkerCopySharedLibs>
+          <commandLine>-Wl,--out-implib,${CND_DISTDIR}/${CND_PLATFORM}/${CND_CONF}/kaphein.a</commandLine>
+        </linkerTool>
+      </compileType>
+      <packaging>
+        <packType>Tar</packType>
+        <output>${CND_DISTDIR}/${CND_PLATFORM}/${CND_CONF}/package/kaphein.dll.tar</output>
+        <packFileList>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+        </packFileList>
+      </packaging>
+      <item path="../../../include/kaphein/Copyable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/ErrorCode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/byteOrder.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/ByteBuffer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/Iterable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/List.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/compconst.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Aabb.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Capsule.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Matrix4x4.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Obb.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Quaternion.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Quaternion_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Ray.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/RaycastHit.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Sphere.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector3.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector3_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector4.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector4_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/raycast.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/internal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/Processor.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/matrix.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/scalar.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/Allocator.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/SegmentPool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/utils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/text/JsonSerializable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/text/encoding.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/Mutex.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/ResetEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/ThreadPool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/utils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/Copyable.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/ErrorCode.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/byteOrder.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/coll/ByteBuffer.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/coll/List.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Aabb.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Capsule.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Matrix4x4.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Quaternion_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Ray.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector3.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector3_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector4.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector4_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/internal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/math/geom3d/Quaternion.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/math/scalar.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/Allocator.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/SegmentPool.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/text/encoding.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/Mutex.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/ResetEvent.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/ThreadPool.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/internal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="2">
+      <toolsSet>
+        <compilerSet>default</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>true</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>../../../include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>KAPHEIN_COMPOPT_DLL_API_MODE=1</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_MODE=0</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_VALUE=KAPHEIN_THREAD_MODEL_PTHREAD</Elem>
+          </preprocessorList>
+          <warningLevel>2</warningLevel>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>../../../include</pElem>
+          </incDir>
+          <preprocessorList>
+            <Elem>KAPHEIN_COMPOPT_DLL_API_MODE=1</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_MODE=0</Elem>
+            <Elem>KAPHEIN_COMPOPT_THREAD_MODEL_VALUE=KAPHEIN_THREAD_MODEL_PTHREAD</Elem>
+          </preprocessorList>
+          <warningLevel>2</warningLevel>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+          <warningLevel>2</warningLevel>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+          <warningLevel>2</warningLevel>
+        </asmTool>
+        <linkerTool>
+          <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kaphein.${CND_DLIB_EXT}</output>
+          <linkerCopySharedLibs>true</linkerCopySharedLibs>
+          <commandLine>-Wl,--out-implib,${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/kaphein.a</commandLine>
+        </linkerTool>
+      </compileType>
+      <packaging>
+        <packType>Tar</packType>
+        <output>${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/package/libnetbeans.dll.tar</output>
+        <packFileList>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+          <packFileListElem type="File"
+                            to="${PACKAGE_TOP_DIR}lib/${OUTPUT_BASENAME}"
+                            from="${OUTPUT_PATH}"
+                            perm="644"
+                            owner="root"
+                            group="bin"/>
+        </packFileList>
+      </packaging>
+      <item path="../../../include/kaphein/Copyable.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/ErrorCode.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/byteOrder.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/ByteBuffer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/Iterable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/List.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/coll/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/compconst.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Aabb.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Capsule.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Matrix4x4.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Obb.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Quaternion.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Quaternion_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Ray.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/RaycastHit.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Sphere.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector3.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector3_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector4.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/Vector4_internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/def.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/geom3d/raycast.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/internal.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/Processor.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/matrix.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/math/scalar.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/Allocator.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/SegmentPool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/mem/utils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/text/JsonSerializable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/text/encoding.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/Mutex.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/ResetEvent.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/ThreadPool.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/internal.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="../../../include/kaphein/thrd/utils.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/Copyable.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/ErrorCode.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/byteOrder.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/coll/ByteBuffer.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/coll/List.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Aabb.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Capsule.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Matrix4x4.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Quaternion_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Ray.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector3.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector3_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector4.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/geom3d/Vector4_internal.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/internal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/math/geom3d/Quaternion.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/math/scalar.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/Allocator.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/SegmentPool.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/mem/utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/text/encoding.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/Mutex.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/ResetEvent.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/ThreadPool.c"
+            ex="false"
+            tool="0"
+            flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/internal.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="../../../src/kaphein/thrd/utils.c" ex="false" tool="0" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>

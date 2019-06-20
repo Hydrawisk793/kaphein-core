@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="kaphein" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/kaphein" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="E:/Hyw793/Projects/kaphein/include" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/kaphein" prefix_auto="0" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add directory="E:/Hyw793/Projects/kaphein/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="../../include/kaphein/Copyable.h" />
+		<Unit filename="../../include/kaphein/ErrorCode.h" />
+		<Unit filename="../../include/kaphein/byteOrder.h" />
+		<Unit filename="../../include/kaphein/coll/Iterable.h" />
+		<Unit filename="../../include/kaphein/coll/List.h" />
+		<Unit filename="../../include/kaphein/coll/def.h" />
+		<Unit filename="../../include/kaphein/compconst.h" />
+		<Unit filename="../../include/kaphein/config.h" />
+		<Unit filename="../../include/kaphein/def.h" />
+		<Unit filename="../../include/kaphein/geom3d/Aabb.h" />
+		<Unit filename="../../include/kaphein/geom3d/Capsule.h" />
+		<Unit filename="../../include/kaphein/geom3d/Matrix4x4.h" />
+		<Unit filename="../../include/kaphein/geom3d/Obb.h" />
+		<Unit filename="../../include/kaphein/geom3d/Quaternion.h" />
+		<Unit filename="../../include/kaphein/geom3d/Quaternion_internal.h" />
+		<Unit filename="../../include/kaphein/geom3d/Ray.h" />
+		<Unit filename="../../include/kaphein/geom3d/RaycastHit.h" />
+		<Unit filename="../../include/kaphein/geom3d/Sphere.h" />
+		<Unit filename="../../include/kaphein/geom3d/Vector3.h" />
+		<Unit filename="../../include/kaphein/geom3d/Vector3_internal.h" />
+		<Unit filename="../../include/kaphein/geom3d/Vector4.h" />
+		<Unit filename="../../include/kaphein/geom3d/Vector4_internal.h" />
+		<Unit filename="../../include/kaphein/geom3d/def.h" />
+		<Unit filename="../../include/kaphein/geom3d/raycast.h" />
+		<Unit filename="../../include/kaphein/internal.h" />
+		<Unit filename="../../include/kaphein/math/Processor.h" />
+		<Unit filename="../../include/kaphein/math/matrix.h" />
+		<Unit filename="../../include/kaphein/math/scalar.h" />
+		<Unit filename="../../include/kaphein/mem/Allocator.h" />
+		<Unit filename="../../include/kaphein/mem/SegmentPool.h" />
+		<Unit filename="../../include/kaphein/mem/utils.h" />
+		<Unit filename="../../include/kaphein/text/JsonSerializable.h" />
+		<Unit filename="../../include/kaphein/text/encoding.h" />
+		<Unit filename="../../include/kaphein/thrd/Mutex.h" />
+		<Unit filename="../../include/kaphein/thrd/ResetEvent.h" />
+		<Unit filename="../../include/kaphein/thrd/ThreadPool.h" />
+		<Unit filename="../../include/kaphein/thrd/internal.h" />
+		<Unit filename="../../include/kaphein/thrd/utils.h" />
+		<Unit filename="../../src/kaphein/Copyable.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/ErrorCode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/byteOrder.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Aabb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Capsule.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Matrix4x4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Quaternion_internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Ray.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Vector3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Vector3_internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Vector4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/geom3d/Vector4_internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/math/geom3d/Quaternion.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/math/scalar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/mem/Allocator.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/mem/SegmentPool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/mem/utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/text/encoding.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/thrd/Mutex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/thrd/ResetEvent.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/thrd/ThreadPool.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/thrd/internal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../src/kaphein/thrd/utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

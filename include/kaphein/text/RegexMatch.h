@@ -1,0 +1,4 @@
+#ifndef KAPHEIN_HGRD_kaphein_text_RegexMatch_h
+#define KAPHEIN_HGRD_kaphein_text_RegexMatch_h
+
+#endif

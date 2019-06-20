@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\kaphein">
+      <UniqueIdentifier>{2c3be55d-cd49-4e9e-a13e-96650da42ca0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\kaphein\test">
+      <UniqueIdentifier>{6a435646-8d3c-4e93-9d0c-b724a295b29f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\kaphein\test\sseTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\ListTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\geom3Test.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\ifTestC.cpp">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\ifTestCxx.cpp">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\regexTest.cpp">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\ringBufferTest.cpp">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\SegmentPoolTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\segmentPoolTest.cpp">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\TreeSetTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\base64Test.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\encodingTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\include\kaphein\test\FileStreamTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
