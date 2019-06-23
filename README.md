@@ -1,8 +1,8 @@
 # kaphein-core
-kaphein is a library project that helps building various applications.
+kaphein is a library that helps building various applications.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ### TODO
 - Refactor all interface and abstract classes to support multiple inheritace in C language.
