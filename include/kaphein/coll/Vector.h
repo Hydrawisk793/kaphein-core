@@ -4,41 +4,18 @@
 #include "../mem/Allocator.h"
 #include "def.h"
 
-struct kaphein_coll_Vector;
-
-struct kaphein_coll_Vector_ElementTraits
+struct kaphein_coll_Vector
 {
-    kaphein_SSize elementSize;
-    
-    kaphein_copyConstructFunction * copyConstruct;
-
-    kaphein_destructFunction * destruct;
+    void * impl_;
 };
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-struct kaphein_coll_Vector *
-kaphein_coll_Vector_new(
-    struct kaphein_mem_Allocator * allocator
-    , void * hint
-    , enum kaphein_ErrorCode * errorCodeOut
-);
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-enum kaphein_ErrorCode
-kaphein_coll_Vector_delete(
-    struct kaphein_coll_Vector * obj
-    , struct kaphein_mem_Allocator * allocator
-);
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_coll_Vector_construct(
     struct kaphein_coll_Vector * thisObj
-    , const struct kaphein_coll_Vector_ElementTraits * elementTraits
     , kaphein_SSize initialCapacity
+    , const struct kaphein_coll_ElementTrait * elementTrait
     , struct kaphein_mem_Allocator * allocator
 );
 
@@ -47,6 +24,14 @@ KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_coll_Vector_destruct(
     struct kaphein_coll_Vector * thisObj
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_Vector_getPointerToElements(
+    const struct kaphein_coll_Vector * thisObj
+    , void ** pointerOut
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
@@ -81,30 +66,68 @@ kaphein_coll_Vector_getCount(
 
 enum kaphein_ErrorCode
 kaphein_coll_Vector_resize(
-    const struct kaphein_coll_Vector * thisObj
+    struct kaphein_coll_Vector * thisObj
+    , kaphein_SSize size
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_Vector_reserve(
+    struct kaphein_coll_Vector * thisObj
     , kaphein_SSize size
 );
 
 enum kaphein_ErrorCode
-kaphein_coll_Vector_reserve(
-    const struct kaphein_coll_Vector * thisObj
-    , kaphein_SSize size
+kaphein_coll_Vector_pushFront(
+    struct kaphein_coll_Vector * thisObj
+    , const void * element
+    , kaphein_SSize elementSize
 );
 
+enum kaphein_ErrorCode
+kaphein_coll_Vector_popFront(
+    struct kaphein_coll_Vector * thisObj
+    , void * elementOut
+    , kaphein_SSize elementOutSize
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_Vector_pushBack(
+    struct kaphein_coll_Vector * thisObj
+    , const void * element
+    , kaphein_SSize elementSize
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_Vector_popBack(
+    struct kaphein_coll_Vector * thisObj
+    , void * elementOut
+    , kaphein_SSize elementOutSize
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_coll_Vector_insert(
     struct kaphein_coll_Vector * thisObj
-    , kaphein_SSize index
-    , const void * element
+    , kaphein_SSize startIndex
+    , const void * elements
     , kaphein_SSize elementSize
+    , kaphein_SSize elementCount
 );
 
 enum kaphein_ErrorCode
 kaphein_coll_Vector_remove(
     struct kaphein_coll_Vector * thisObj
     , kaphein_SSize index
-    , void * elementOut
-    , kaphein_SSize * elementSizeInOut
+    , kaphein_SSize count
+    , void * elementsOut
+    , kaphein_SSize elementsOutSize
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE

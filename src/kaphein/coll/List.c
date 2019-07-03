@@ -173,7 +173,7 @@ kaphein_coll_List_pushFront(
 
             if(thisObj->head_ != KAPHEIN_NULL) {
                 ((struct kaphein_x_Node *)thisObj->head_)->prev_ = newNode;
-                newNode->next_ = thisObj->head_;
+                newNode->next_ = (struct kaphein_x_Node *)thisObj->head_;
             }
             thisObj->head_ = newNode;
 
@@ -201,11 +201,11 @@ kaphein_coll_List_popFront(
         errorCode = kapheinErrorCodeCollectionUnderflow;
     }
     else {
-        errorCode = kaphein_x_Node_copyElement(thisObj->head_, thisObj, elementOut, elementSizeInOut);
+        errorCode = kaphein_x_Node_copyElement((const struct kaphein_x_Node *)thisObj->head_, thisObj, elementOut, elementSizeInOut);
         if(errorCode == kapheinErrorCodeNoError) {
             nextOfHead = ((struct kaphein_x_Node *)thisObj->head_)->next_;
 
-            errorCode = kaphein_x_Node_destroy(thisObj->head_, thisObj);
+            errorCode = kaphein_x_Node_destroy((struct kaphein_x_Node *)thisObj->head_, thisObj);
             if(errorCode == kapheinErrorCodeNoError) {
                 if(nextOfHead != KAPHEIN_NULL) {
                    nextOfHead->prev_ = KAPHEIN_NULL;
@@ -241,7 +241,7 @@ kaphein_coll_List_peekFront(
         errorCode = kapheinErrorCodeCollectionUnderflow;
     }
     else {
-        errorCode = kaphein_x_Node_copyElement(thisObj->head_, thisObj, elementOut, elementSizeInOut);
+        errorCode = kaphein_x_Node_copyElement((const struct kaphein_x_Node *)thisObj->head_, thisObj, elementOut, elementSizeInOut);
     }
 
     return errorCode;
@@ -272,7 +272,7 @@ kaphein_coll_List_pushBack(
 
             if(thisObj->tail_ != KAPHEIN_NULL) {
                 ((struct kaphein_x_Node *)thisObj->tail_)->next_ = newNode;
-                newNode->prev_ = thisObj->tail_;
+                newNode->prev_ = (struct kaphein_x_Node *)thisObj->tail_;
             }
             thisObj->tail_ = newNode;
 
@@ -300,11 +300,11 @@ kaphein_coll_List_popBack(
         errorCode = kapheinErrorCodeCollectionUnderflow;
     }
     else {
-        errorCode = kaphein_x_Node_copyElement(thisObj->tail_, thisObj, elementOut, elementSizeInOut);
+        errorCode = kaphein_x_Node_copyElement((const struct kaphein_x_Node *)thisObj->tail_, thisObj, elementOut, elementSizeInOut);
         if(errorCode == kapheinErrorCodeNoError) {
             prevOfTail = ((struct kaphein_x_Node *)thisObj->tail_)->prev_;
 
-            errorCode = kaphein_x_Node_destroy(thisObj->tail_, thisObj);
+            errorCode = kaphein_x_Node_destroy((struct kaphein_x_Node *)thisObj->tail_, thisObj);
             if(errorCode == kapheinErrorCodeNoError) {
                 if(prevOfTail != KAPHEIN_NULL) {
                    prevOfTail->next_ = KAPHEIN_NULL;
@@ -340,7 +340,7 @@ kaphein_coll_List_peekBack(
         errorCode = kapheinErrorCodeCollectionUnderflow;
     }
     else {
-        errorCode = kaphein_x_Node_copyElement(thisObj->tail_, thisObj, elementOut, elementSizeInOut);
+        errorCode = kaphein_x_Node_copyElement((const struct kaphein_x_Node *)thisObj->tail_, thisObj, elementOut, elementSizeInOut);
     }
 
     return errorCode;

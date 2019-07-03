@@ -1,8 +1,7 @@
 #ifndef KAPHEIN_HGRD_kaphein_coll_def_h
 #define KAPHEIN_HGRD_kaphein_coll_def_h
 
-#include "../def.h"
-#include "../ErrorCode.h"
+#include "../mem/Allocator.h"
 
 typedef int kaphein_coll_compareFunction(
     const void * lhs
@@ -16,11 +15,13 @@ typedef void kaphein_coll_swapFunction(
 
 struct kaphein_coll_ElementTrait
 {
+    kaphein_SSize elementSize;
+
     enum kaphein_ErrorCode
     (* copyConstruct) (
         void * objOut
         , const void * src
-        , void * allocator
+        , struct kaphein_mem_Allocator * allocator
     );
 
     enum kaphein_ErrorCode
@@ -31,8 +32,6 @@ struct kaphein_coll_ElementTrait
     kaphein_coll_swapFunction * swap;
 
     kaphein_coll_compareFunction * compare;
-
-    kaphein_SSize elementSize;
 };
 
 #endif

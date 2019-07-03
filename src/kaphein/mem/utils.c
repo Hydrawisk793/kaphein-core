@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
 #include <string.h>
 #include "kaphein/ErrorCode.h"
 #include "kaphein/mem/defAlloc.h"
@@ -96,7 +92,7 @@ kaphein_mem_allocate(
         }
         else {
             memory = (*allocator->vTable->allocate)(
-                allocator
+                allocator->thisObj
                 , memorySize
                 , hint
                 , errorCodeOut
@@ -131,7 +127,7 @@ kaphein_mem_deallocate(
         }
         else {
             errorCode = (*allocator->vTable->deallocate)(
-                allocator
+                allocator->thisObj
                 , memory
                 , memorySize
             );

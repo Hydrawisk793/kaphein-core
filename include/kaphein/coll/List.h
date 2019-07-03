@@ -8,7 +8,7 @@ struct kaphein_coll_List
 {
     const struct kaphein_coll_ElementTrait * elementTrait_;
 
-    void * allocator_;
+    struct kaphein_mem_Allocator * allocator_;
 
     void * head_;
 

@@ -7,6 +7,17 @@
 struct kaphein_io_Stream_VTable
 {
     enum kaphein_ErrorCode
+    (* destruct) (
+        void * thisObj
+    );
+
+    enum kaphein_ErrorCode
+    (* isOpened) (
+        const void * thisObj
+        , bool * truthOut
+    );
+
+    enum kaphein_ErrorCode
     (* close) (
         void * thisObj
     );
@@ -14,13 +25,13 @@ struct kaphein_io_Stream_VTable
     enum kaphein_ErrorCode
     (* getSize) (
         const void * thisObj
-        , kaphein_SSize * sizeOut
+        , kaphein_Int64 * sizeOut
     );
 
     enum kaphein_ErrorCode
     (* getPosition) (
         const void * thisObj
-        , kaphein_SSize * positionOut
+        , kaphein_Int64 * positionOut
     );
 
     enum kaphein_ErrorCode
@@ -93,21 +104,18 @@ struct kaphein_io_Stream_VTable
     );
 
     enum kaphein_ErrorCode
-    (* transferTo) (
-        void * thisObj
-        , void * destStream
-    );
-
-    enum kaphein_ErrorCode
     (* seek) (
         void * thisObj
-        , kaphein_IntLeast64 offset
+        , kaphein_Int64 offset
         , enum kaphein_io_SeekOrigin origin
+        , kaphein_Int64 * newPositionOut
     );
 };
 
 struct kaphein_io_Stream
 {
+    void * thisObj;
+
     const struct kaphein_io_Stream_VTable * vTable;
 };
 

@@ -3,7 +3,8 @@
 #include "kaphein/mem/SegmentPool.h"
 #include "kaphein/mem/Allocator.h"
 
-#define KAPHEIN_x_align_offset(ptr, alignSize) (alignSize - (KAPHEIN_x_horrible_cast(kaphein_UIntPtr, ptr) & (alignSize - 1)))
+#define KAPHEIN_x_align_offset(ptr, alignSize) \
+    (alignSize - (KAPHEIN_x_horrible_cast(kaphein_UIntPtr, ptr) & (alignSize - 1)))
 
 union kaphein_x_MaximumAlignment
 {
@@ -70,7 +71,8 @@ static struct kaphein_x_SegmentHeader * kaphein_mem_SegmentPool_findNextAvailabl
 }
 
 static const struct kaphein_mem_Allocator_VTable parentVTable = {
-    kaphein_mem_SegmentPool_allocate
+    KAPHEIN_NULL
+    , kaphein_mem_SegmentPool_allocate
     , KAPHEIN_NULL
 };
 
@@ -125,7 +127,7 @@ kaphein_mem_SegmentPool_construct(
     else {
         thisObjOut->parent.vTable = &parentVTable;
         
-        thisObjOut->memoryBegin_ = memory;
+        thisObjOut->memoryBegin_ = (char *)memory;
         thisObjOut->memoryEnd_ = thisObjOut->memoryBegin_ + memorySize;
         thisObjOut->begin_ = KAPHEIN_x_horrible_cast(struct kaphein_x_SegmentHeader *, thisObjOut->memoryBegin_ + KAPHEIN_x_align_offset(thisObjOut->memoryBegin_, sizeof(struct kaphein_x_SegmentHeader) / 4));
 

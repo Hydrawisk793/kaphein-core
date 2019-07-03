@@ -1,7 +1,7 @@
 #ifndef KAPHEIN_HGRD_kaphein_math_Interval_h
 #define KAPHEIN_HGRD_kaphein_math_Interval_h
 
-#include "../ErrorCode.h"
+#include "../def.h"
 
 struct kaphein_math_Interval
 {

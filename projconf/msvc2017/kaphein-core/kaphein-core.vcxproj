@@ -38,6 +38,7 @@
     <ClInclude Include="..\..\..\include\kaphein\io\Stream.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\def.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\Interval.h" />
+    <ClInclude Include="..\..\..\include\kaphein\math\IntervalInt32.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\matrix.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\Quaternion.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\scalar.h" />
@@ -50,9 +51,10 @@
     <ClInclude Include="..\..\..\include\kaphein\ppgen\IntegerTypeTraits.h" />
     <ClInclude Include="..\..\..\include\kaphein\text\base64.h" />
     <ClInclude Include="..\..\..\include\kaphein\text\encoding.h" />
-    <ClInclude Include="..\..\..\include\kaphein\text\Regex.h" />
-    <ClInclude Include="..\..\..\include\kaphein\text\RegexMatch.h" />
-    <ClInclude Include="..\..\..\include\kaphein\text\Regex_fwd.h" />
+    <ClInclude Include="..\..\..\include\kaphein\text\LexerGenerator.h" />
+    <ClInclude Include="..\..\..\include\kaphein\text\Lexer.h" />
+    <ClInclude Include="..\..\..\include\kaphein\text\Match.h" />
+    <ClInclude Include="..\..\..\include\kaphein\text\def.h" />
     <ClInclude Include="..\..\..\include\kaphein\text\utils.h" />
     <ClInclude Include="..\..\..\include\kaphein\thrd\Mutex.h" />
     <ClInclude Include="..\..\..\include\kaphein\thrd\ResetEvent.h" />
@@ -66,6 +68,7 @@
     <ClCompile Include="..\..\..\src\kaphein\ErrorCode.c" />
     <ClCompile Include="..\..\..\src\kaphein\io\FileStream_windows.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\Interval.c" />
+    <ClCompile Include="..\..\..\src\kaphein\math\IntervalInt32.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\matrix.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\quaternion_c.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\scalar.c" />
@@ -77,7 +80,8 @@
     <ClCompile Include="..\..\..\src\kaphein\ppgen\IntegerTypeTraits.c" />
     <ClCompile Include="..\..\..\src\kaphein\text\base64.c" />
     <ClCompile Include="..\..\..\src\kaphein\text\encoding.c" />
-    <ClCompile Include="..\..\..\src\kaphein\text\Regex.c" />
+    <ClCompile Include="..\..\..\src\kaphein\text\Lexer.c" />
+    <ClCompile Include="..\..\..\src\kaphein\text\LexerGenerator.c" />
     <ClCompile Include="..\..\..\src\kaphein\text\utils.c" />
     <ClCompile Include="..\..\..\src\kaphein\thrd\Mutex_windows.c" />
     <ClCompile Include="..\..\..\src\kaphein\thrd\Mutex_pthread.c" />
@@ -155,10 +159,10 @@
       <SDLCheck>true</SDLCheck>
       <AssemblerListingLocation>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\ext\win-pthread\include;$(ProjectDir)..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
+      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link />
     <Link />
@@ -174,10 +178,10 @@
       <SDLCheck>true</SDLCheck>
       <AssemblerListingLocation>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\ext\win-pthread\include;$(ProjectDir)..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
+      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link />
     <Link />
@@ -197,9 +201,9 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AssemblerListingLocation>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\ext\win-pthread\include;$(ProjectDir)..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
+      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -219,9 +223,9 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AssemblerListingLocation>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)dummy\dummy\dummy\%(RelativeDir)</ObjectFileName>
-      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\ext\win-pthread\include;$(ProjectDir)..\..\..\include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsC</CompileAs>
+      <PreprocessorDefinitions>KAPHEIN_COMPOPT_DLL_API_MODE#1;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

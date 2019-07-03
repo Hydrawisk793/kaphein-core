@@ -58,6 +58,17 @@ kaphein_mem_fill(
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
+/**
+ *  @brief Compares the contents of two memory blocks.
+ *  @param lhs A pointer to a memory block.
+ *  @param lhsSize The size of the memory block pointed by lhs.
+ *  @param rhs A pointer to the other memory block.
+ *  @param rhsSize The size of the memory block pointed by rhs.
+ *  @return The comparison result.
+ *  <br/>- zero : Two memory blocks are equal.
+ *  <br/>- negative numbers : 
+ *  <br/>- positive numbers : 
+ */
 int
 kaphein_mem_compare(
     const void * lhs

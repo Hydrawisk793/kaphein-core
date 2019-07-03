@@ -18,14 +18,14 @@ KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_io_FileStream_construct(
     struct kaphein_io_FileStream * thisObj
-    , void * allocator
+    , struct kaphein_mem_Allocator * allocator
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_io_FileStream_destruct(
-    struct kaphein_io_FileStream * thisObj
+    void * thisObj
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
@@ -42,14 +42,16 @@ kaphein_io_FileStream_openFromFilePath(
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
-kaphein_io_FileStream_close(
-    void * thisObj
+kaphein_io_FileStream_isOpened(
+    const void * thisObj
+    , bool * truthOut
 );
 
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
-kaphein_io_FileStream_isOpened(
-    const struct kaphein_io_FileStream * thisObj
-    , bool * truthOut
+kaphein_io_FileStream_close(
+    void * thisObj
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
@@ -69,10 +71,20 @@ kaphein_io_FileStream_getFilePath(
     , kaphein_SSize * pathSizeInOut
 );
 
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_io_FileStream_getSize(
     const void * thisObj
-    , kaphein_SSize * sizeOut
+    , kaphein_Int64 * sizeOut
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_io_FileStream_getPosition(
+    const void * thisObj
+    , kaphein_Int64 * positionOut
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
@@ -87,6 +99,14 @@ KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_io_FileStream_canWrite(
+    const void * thisObj
+    , bool * truthOut
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_io_FileStream_canSeek(
     const void * thisObj
     , bool * truthOut
 );
@@ -112,17 +132,11 @@ kaphein_io_FileStream_write(
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
-kaphein_io_FileStream_toConstStream(
-    const struct kaphein_io_FileStream * thisObj
-    , const struct kaphein_io_Stream ** streamOut
-);
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-enum kaphein_ErrorCode
-kaphein_io_FileStream_toStream(
-    struct kaphein_io_FileStream * thisObj
-    , struct kaphein_io_Stream ** streamOut
+kaphein_io_FileStream_seek(
+    void * thisObj
+    , kaphein_Int64 offset
+    , enum kaphein_io_SeekOrigin origin
+    , kaphein_Int64 * newPositionOut
 );
 
 #endif

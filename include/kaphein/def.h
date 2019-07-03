@@ -818,6 +818,13 @@ enum kaphein_ErrorCode
     , kapheinErrorCodeSingularMatrix = kapheinErrorCodeArithmeticError - 2
 };
 
+/**
+ *  @brief Gets the error message text of specified error code.
+ *  @param errorCode 
+ *  @param[out] messageOut 
+ *  @param[in,out] messageSizeInOut 
+ *  @return An error code.
+ */
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
@@ -832,13 +839,17 @@ kaphein_ErrorCode_getMessage(
 
 struct kaphein_mem_Allocator;
 
-typedef enum kaphein_ErrorCode kaphein_copyConstructFunction(
+typedef
+enum kaphein_ErrorCode
+kaphein_copyConstructFunction(
     void * dest
     , const void * src
     , struct kaphein_mem_Allocator * allocator
 );
 
-typedef enum kaphein_ErrorCode kaphein_destructFunction(
+typedef
+enum kaphein_ErrorCode
+kaphein_destructFunction(
     void * thisObj
 );
 

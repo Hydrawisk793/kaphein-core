@@ -3,6 +3,7 @@
 
 #include "../def.h"
 #include "../ErrorCode.h"
+#include "../mem/Allocator.h"
 
 /**
  *  @brief Represents mutex objects that are used to protect shared data from being simultaneously accessed by multiple threads.
@@ -23,7 +24,7 @@ KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_thrd_Mutex_construct(
     struct kaphein_thrd_Mutex * thisObj
-    , void * allocator
+    , struct kaphein_mem_Allocator * allocator
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE

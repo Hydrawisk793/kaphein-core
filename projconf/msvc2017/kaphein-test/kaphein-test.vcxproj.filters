@@ -55,5 +55,8 @@
     <ClCompile Include="..\..\..\src\kaphein\test\OopTest.c">
       <Filter>src\kaphein\test</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\test\VectorTest.c">
+      <Filter>src\kaphein\test</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

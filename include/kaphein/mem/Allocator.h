@@ -6,6 +6,11 @@
 
 struct kaphein_mem_Allocator_VTable
 {
+    enum kaphein_ErrorCode
+    (* destruct) (
+        void * thisObj
+    );
+
     void *
     (* allocate) (
         void * thisObj
@@ -24,6 +29,8 @@ struct kaphein_mem_Allocator_VTable
 
 struct kaphein_mem_Allocator
 {
+    void * thisObj;
+
     const struct kaphein_mem_Allocator_VTable * vTable;
 };
 

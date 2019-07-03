@@ -5,7 +5,7 @@
 enum kaphein_ErrorCode
 kaphein_thrd_Mutex_construct(
     struct kaphein_thrd_Mutex * thisObj
-    , void * allocator
+    , struct kaphein_mem_Allocator * allocator
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -16,7 +16,7 @@ kaphein_thrd_Mutex_construct(
         resultErrorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        thisObj->impl_ = (void *)CreateMutex(NULL, false, NULL);
+        thisObj->impl_ = (void *)CreateMutex(NULL, FALSE, NULL);
         if(NULL == thisObj->impl_) {
             resultErrorCode = kapheinErrorCodePlatformResourceAllocationFailed;
         }

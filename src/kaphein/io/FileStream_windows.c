@@ -3,9 +3,9 @@
 #include "kaphein/text/encoding.h"
 #include "kaphein/io/FileStream.h"
 
-struct Impl
+struct FileStream_Impl
 {
-    void * allocator_;
+    struct kaphein_mem_Allocator * allocator_;
     
     HANDLE natvieHandle_;
 
@@ -16,9 +16,11 @@ struct Impl
 
 //TODO : Fill the contents of this virtual table.
 static const struct kaphein_io_Stream_VTable parentVTable = {
-    kaphein_io_FileStream_close
+    kaphein_io_FileStream_destruct
+    , kaphein_io_FileStream_isOpened
+    , kaphein_io_FileStream_close
     , kaphein_io_FileStream_getSize
-    , KAPHEIN_NULL
+    , kaphein_io_FileStream_getPosition
     , KAPHEIN_NULL
     , KAPHEIN_NULL
     , KAPHEIN_NULL
@@ -26,21 +28,43 @@ static const struct kaphein_io_Stream_VTable parentVTable = {
     , KAPHEIN_NULL
     , kaphein_io_FileStream_canRead
     , kaphein_io_FileStream_canWrite
-    , KAPHEIN_NULL
+    , kaphein_io_FileStream_canSeek
     , kaphein_io_FileStream_read
     , KAPHEIN_NULL
     , KAPHEIN_NULL
-    , KAPHEIN_NULL
-    , KAPHEIN_NULL
+    , kaphein_io_FileStream_seek
 };
 
 static
 int
-kaphein_io_FileStream_toWinApiFileAccess(
+toWinApiFileSeekOrigin(
+    enum kaphein_io_SeekOrigin seekOrigin
+)
+{
+    int winApiFileSeekOrigin = FILE_BEGIN;
+    
+    switch(seekOrigin) {
+    case kaphein_io_SeekOrigin_begin:
+        winApiFileSeekOrigin = FILE_BEGIN;
+    break;
+    case kaphein_io_SeekOrigin_current:
+        winApiFileSeekOrigin = FILE_CURRENT;
+    break;
+    case kaphein_io_SeekOrigin_end:
+        winApiFileSeekOrigin = FILE_END;
+    break;
+    }
+
+    return winApiFileSeekOrigin;
+}
+
+static
+int
+toWinApiFileAccess(
     enum kaphein_io_FileAccess fileAccess
 )
 {
-    int result = 0;
+    int result = GENERIC_READ;
     
     switch(fileAccess) {
     case kaphein_io_FileAccess_none:
@@ -61,11 +85,11 @@ kaphein_io_FileStream_toWinApiFileAccess(
 
 static
 int
-kaphein_io_FileStream_toWinApiFileMode(
+toWinApiFileMode(
     enum kaphein_io_FileMode fileMode
 )
 {
-    int result = 0;
+    int result = OPEN_EXISTING;
     
     switch(fileMode) {
     case kaphein_io_FileMode_open:
@@ -94,30 +118,31 @@ kaphein_io_FileStream_toWinApiFileMode(
 enum kaphein_ErrorCode
 kaphein_io_FileStream_construct(
     struct kaphein_io_FileStream * thisObj
-    , void * allocator
+    , struct kaphein_mem_Allocator * allocator
 )
 {
-    enum kaphien_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
     
     if(KAPHEIN_NULL == thisObj) {
         resultErrorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        struct Impl *const implPtr = (struct Impl *)kaphein_mem_allocate(
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)kaphein_mem_allocate(
             allocator
-            , KAPHEIN_ssizeof(*implPtr)
+            , KAPHEIN_ssizeof(*impl)
             , KAPHEIN_NULL
             , &resultErrorCode
         );
 
         if(kapheinErrorCodeNoError == resultErrorCode) {
+            thisObj->parent.thisObj = thisObj;
             thisObj->parent.vTable = &parentVTable;
-            thisObj->impl_ = implPtr;
+            thisObj->impl_ = impl;
             
-            implPtr->allocator_ = allocator;
-            implPtr->natvieHandle_ = INVALID_HANDLE_VALUE;
-            implPtr->overlapped_.hEvent = NULL;
-            implPtr->fileAccess_ = kaphein_io_FileAccess_none;
+            impl->allocator_ = allocator;
+            impl->natvieHandle_ = INVALID_HANDLE_VALUE;
+            impl->overlapped_.hEvent = NULL;
+            impl->fileAccess_ = kaphein_io_FileAccess_none;
         }
     }
 
@@ -126,19 +151,25 @@ kaphein_io_FileStream_construct(
 
 enum kaphein_ErrorCode
 kaphein_io_FileStream_destruct(
-    struct kaphein_io_FileStream * thisObj
+    void * thisObj
 )
 {
-    enum kaphien_ErrorCode resultErrorCode = kaphein_io_FileStream_close(thisObj);
+    struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
+    enum kaphein_ErrorCode resultErrorCode = kaphein_io_FileStream_close(thisPtr);
     
     if(kapheinErrorCodeNoError == resultErrorCode) {
-        struct Impl *const implPtr = (struct Impl *)thisObj->impl_;
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)thisPtr->impl_;
 
         resultErrorCode = kaphein_mem_deallocate(
-            implPtr->allocator_
-            , implPtr
-            , KAPHEIN_ssizeof(*implPtr)
+            impl->allocator_
+            , impl
+            , KAPHEIN_ssizeof(*impl)
         );
+
+        if(kapheinErrorCodeNoError == resultErrorCode) {
+            thisPtr->parent.thisObj = KAPHEIN_NULL;
+            thisPtr->parent.vTable = KAPHEIN_NULL;
+        }
     }
 
     return resultErrorCode;
@@ -168,7 +199,7 @@ kaphein_io_FileStream_openFromFilePath(
         errorCode = kapheinErrorCodeOperationInvalid;
     }
     else {
-        struct Impl *const implPtr = (struct Impl *)thisObj->impl_;
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)thisObj->impl_;
         kaphein_UIntLeast16 * utf16FilePath = KAPHEIN_NULL;
         kaphein_SSize utf16FilePathSize;
 
@@ -182,7 +213,7 @@ kaphein_io_FileStream_openFromFilePath(
             goto endOfOpen;
         }
         
-        utf16FilePath = kaphein_mem_allocate(
+        utf16FilePath = (kaphein_UIntLeast16 *)kaphein_mem_allocate(
             KAPHEIN_NULL
             , (utf16FilePathSize + 1) * sizeof(*utf16FilePath)
             , KAPHEIN_NULL
@@ -200,16 +231,16 @@ kaphein_io_FileStream_openFromFilePath(
             , &utf16FilePathSize
         );
 
-        implPtr->natvieHandle_ = CreateFileW(
+        impl->natvieHandle_ = CreateFileW(
             KAPHEIN_x_const_horrible_cast(LPCWSTR, utf16FilePath)
-            , kaphein_io_FileStream_toWinApiFileAccess(fileAccess)
+            , toWinApiFileAccess(fileAccess)
             , 0
             , NULL
-            , kaphein_io_FileStream_toWinApiFileMode(fileMode)
+            , toWinApiFileMode(fileMode)
             , FILE_FLAG_OVERLAPPED
             , NULL
         );
-        if(INVALID_HANDLE_VALUE == implPtr->natvieHandle_) {
+        if(INVALID_HANDLE_VALUE == impl->natvieHandle_) {
             switch(GetLastError()) {
             case ERROR_FILE_NOT_FOUND:
                 errorCode = kapheinErrorCodeIoDeviceNotFound;
@@ -229,18 +260,18 @@ kaphein_io_FileStream_openFromFilePath(
             goto endOfOpen;
         }
         
-        kaphein_mem_fillZero(&implPtr->overlapped_, KAPHEIN_ssizeof(implPtr->overlapped_), KAPHEIN_ssizeof(implPtr->overlapped_));
+        kaphein_mem_fillZero(&impl->overlapped_, KAPHEIN_ssizeof(impl->overlapped_), KAPHEIN_ssizeof(impl->overlapped_));
 
-        implPtr->overlapped_.hEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
-        if(NULL == implPtr->overlapped_.hEvent) {
+        impl->overlapped_.hEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
+        if(NULL == impl->overlapped_.hEvent) {
             errorCode = kapheinErrorCodePlatformResourceAllocationFailed;
 
             goto endOfOpen;
         }
-        implPtr->fileAccess_ = fileAccess;
+        impl->fileAccess_ = fileAccess;
 
         if(kaphein_io_FileMode_append == fileMode) {
-            //TODO : Seek to the end.
+            errorCode = kaphein_io_FileStream_seek(thisObj, 0, kaphein_io_SeekOrigin_end, KAPHEIN_NULL);
         }
 
     endOfOpen:
@@ -251,6 +282,30 @@ kaphein_io_FileStream_openFromFilePath(
                 , (utf16FilePathSize + 1) * sizeof(*utf16FilePath)
             );
         }
+    }
+
+    return errorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_io_FileStream_isOpened(
+    const void * thisObj
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == truthOut
+    ) {
+        errorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct kaphein_io_FileStream *const thisPtr = (const struct kaphein_io_FileStream *)thisObj;
+        const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisPtr->impl_;
+
+        *truthOut = impl->natvieHandle_ != INVALID_HANDLE_VALUE;
     }
 
     return errorCode;
@@ -268,37 +323,17 @@ kaphein_io_FileStream_close(
         errorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        struct Impl *const implPtr = (struct Impl *)thisPtr->impl_;
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)thisPtr->impl_;
 
-        if(INVALID_HANDLE_VALUE != implPtr->natvieHandle_ ) {
-            CloseHandle(implPtr->natvieHandle_);
+        if(INVALID_HANDLE_VALUE != impl->natvieHandle_ ) {
+            CloseHandle(impl->natvieHandle_);
         }
-        implPtr->natvieHandle_ = INVALID_HANDLE_VALUE;
+        impl->natvieHandle_ = INVALID_HANDLE_VALUE;
 
-        if(NULL != implPtr->overlapped_.hEvent) {
-            CloseHandle(implPtr->overlapped_.hEvent);
+        if(NULL != impl->overlapped_.hEvent) {
+            CloseHandle(impl->overlapped_.hEvent);
         }
-        implPtr->overlapped_.hEvent = NULL;
-    }
-
-    return errorCode;
-}
-
-enum kaphein_ErrorCode
-kaphein_io_FileStream_isOpened(
-    const struct kaphein_io_FileStream * thisObj
-    , bool * truthOut
-)
-{
-    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
-
-    if(thisObj == KAPHEIN_NULL || truthOut == KAPHEIN_NULL) {
-        errorCode = kapheinErrorCodeArgumentNull;
-    }
-    else {
-        struct Impl *const implPtr = (struct Impl *)thisObj->impl_;
-
-        *truthOut = implPtr->natvieHandle_ != INVALID_HANDLE_VALUE;
+        impl->overlapped_.hEvent = NULL;
     }
 
     return errorCode;
@@ -316,9 +351,9 @@ kaphein_io_FileStream_getFileAccess(
         errorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        struct Impl *const implPtr = (struct Impl *)thisObj->impl_;
+        const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisObj->impl_;
 
-        *accessOut = implPtr->fileAccess_;
+        *accessOut = impl->fileAccess_;
     }
     
     return kapheinErrorCodeNoError;
@@ -331,18 +366,14 @@ kaphein_io_FileStream_getFilePath(
     , kaphein_SSize * pathSizeInOut
 )
 {
-    enum kaphein_ErrorCode errorCode;
+    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
     bool isOpened;
 
-    errorCode = kaphein_io_FileStream_isOpened(thisObj, &isOpened);
-    if(errorCode == kapheinErrorCodeNoError && isOpened) {
-        struct Impl *const implPtr = (struct Impl *)thisObj->impl_;
-
+    if(kaphein_io_FileStream_isOpened(thisObj, &isOpened), isOpened) {
+        const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisObj->impl_;
         FILE_NAME_INFO fni;
-        BOOL result;
 
-        result = GetFileInformationByHandleEx(implPtr->natvieHandle_, FileNameInfo, &fni, (DWORD)sizeof(fni));
-        if(FALSE == result) {
+        if(FALSE == GetFileInformationByHandleEx(impl->natvieHandle_, FileNameInfo, &fni, (DWORD)sizeof(fni))) {
             errorCode = kapheinErrorCodeUnknownError;
         }
         else {
@@ -361,29 +392,46 @@ kaphein_io_FileStream_getFilePath(
 enum kaphein_ErrorCode
 kaphein_io_FileStream_getSize(
     const void * thisObj
-    , kaphein_SSize * sizeOut
+    , kaphein_Int64 * sizeOut
 )
 {
-    struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
     enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
     bool isOpened;
 
-    errorCode = kaphein_io_FileStream_isOpened(thisPtr, &isOpened);
-    if(errorCode == kapheinErrorCodeNoError) {
-        if(!isOpened) {
-            errorCode = kapheinErrorCodeOperationInvalid;
+    if(kaphein_io_FileStream_isOpened(thisObj, &isOpened), !isOpened) {
+        errorCode = kapheinErrorCodeOperationInvalid;
+    }
+    else {
+        const struct kaphein_io_FileStream *const thisPtr = (const struct kaphein_io_FileStream *)thisObj;
+        const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisPtr->impl_;
+        DWORD fileSizeLow, fileSizeHigh;
+
+        fileSizeLow = GetFileSize(impl->natvieHandle_, &fileSizeHigh);
+        if((fileSizeHigh & (1 << ((sizeof(DWORD) << 3) - 1))) != 0) {
+            errorCode = kapheinErrorCodeNotSupported;
         }
         else {
-            struct Impl *const implPtr = (struct Impl *)thisPtr->impl_;
-            LARGE_INTEGER fileSize;
-
-            GetFileSizeEx(implPtr->natvieHandle_, &fileSize);
-
-            *sizeOut = (kaphein_SSize)fileSize.QuadPart;
+            *sizeOut = (kaphein_Int64)(((kaphein_Int64)fileSizeHigh << (sizeof(DWORD) << 3)) | fileSizeLow);
         }
     }
 
     return errorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_io_FileStream_getPosition(
+    const void * thisObj
+    , kaphein_Int64 * positionOut
+)
+{
+    //It's safe to do this because this operation does not change the internal state of the object.
+    
+    return kaphein_io_FileStream_seek(
+        (void *)thisObj
+        , 0
+        , kaphein_io_SeekOrigin_current
+        , positionOut
+    );
 }
 
 enum kaphein_ErrorCode
@@ -392,21 +440,21 @@ kaphein_io_FileStream_canRead(
     , bool * truthOut
 )
 {
-    struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
     enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
-    bool isOpened;
 
     if(KAPHEIN_NULL == truthOut) {
         errorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        errorCode = kaphein_io_FileStream_isOpened(thisObj, &isOpened);
-        if(kapheinErrorCodeNoError == errorCode) {
-            struct Impl *const implPtr = (struct Impl *)thisPtr->impl_;
+        bool isOpened;
+        
+        if(kaphein_io_FileStream_isOpened(thisObj, &isOpened), isOpened) {    
+            const struct kaphein_io_FileStream *const thisPtr = (const struct kaphein_io_FileStream *)thisObj;
+            const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisPtr->impl_;
 
             *truthOut = 
                 isOpened
-                & ((implPtr->fileAccess_ & kaphein_io_FileAccess_read) != 0)
+                & ((impl->fileAccess_ & kaphein_io_FileAccess_read) != 0)
             ;
         }
     }
@@ -420,23 +468,48 @@ kaphein_io_FileStream_canWrite(
     , bool * truthOut
 )
 {
-    struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
     enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
-    bool isOpened;
 
     if(KAPHEIN_NULL == truthOut) {
         errorCode = kapheinErrorCodeArgumentNull;
     }
     else {
-        errorCode = kaphein_io_FileStream_isOpened(thisObj, &isOpened);
-        if(kapheinErrorCodeNoError == errorCode) {
-            struct Impl *const implPtr = (struct Impl *)thisPtr->impl_;
+        bool isOpened;
+        
+        if(kaphein_io_FileStream_isOpened(thisObj, &isOpened), isOpened) {    
+            const struct kaphein_io_FileStream *const thisPtr = (const struct kaphein_io_FileStream *)thisObj;
+            const struct FileStream_Impl *const impl = (const struct FileStream_Impl *)thisPtr->impl_;
 
             *truthOut = 
                 isOpened
-                & ((implPtr->fileAccess_ & kaphein_io_FileAccess_write) != 0)
+                & ((impl->fileAccess_ & kaphein_io_FileAccess_write) != 0)
             ;
         }
+    }
+
+    return errorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_io_FileStream_canSeek(
+    const void * thisObj
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == truthOut) {
+        errorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        kaphein_Int64 position;
+        bool isOpened;
+
+        kaphein_io_FileStream_isOpened(thisObj, &isOpened);
+
+        *truthOut = isOpened
+            && kapheinErrorCodeNoError == kaphein_io_FileStream_getPosition(thisObj, &position)
+        ;
     }
 
     return errorCode;
@@ -451,22 +524,20 @@ kaphein_io_FileStream_read(
 )
 {
     struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
-    LARGE_INTEGER largeInteger;
-    enum kaphein_ErrorCode errorCode;
+    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
     bool isOpened;
 
-    errorCode = kaphein_io_FileStream_isOpened(thisObj, &isOpened);
-    if(errorCode == kapheinErrorCodeNoError && isOpened) {
-        struct Impl *const implPtr = (struct Impl *)thisPtr->impl_;
+    if(kaphein_io_FileStream_isOpened(thisObj, &isOpened), isOpened) {
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)thisPtr->impl_;
         DWORD readByteCount = 0;
         BOOL result;
         
         result = ReadFile(
-            implPtr->natvieHandle_
+            impl->natvieHandle_
             , dest
             , (DWORD)destSize
             , &readByteCount
-            , &implPtr->overlapped_
+            , &impl->overlapped_
         );
 
         while(FALSE == result) {
@@ -477,19 +548,21 @@ kaphein_io_FileStream_read(
             break;
             case ERROR_IO_PENDING:
                 result = GetOverlappedResultEx(
-                    implPtr->natvieHandle_
-                    , &implPtr->overlapped_
+                    impl->natvieHandle_
+                    , &impl->overlapped_
                     , &readByteCount
                     , INFINITE
                     , TRUE
                 );
 
                 if(TRUE == result) {
-                    largeInteger.LowPart = implPtr->overlapped_.Offset;
-                    largeInteger.HighPart = implPtr->overlapped_.OffsetHigh;
+                    LARGE_INTEGER largeInteger;
+
+                    largeInteger.LowPart = impl->overlapped_.Offset;
+                    largeInteger.HighPart = impl->overlapped_.OffsetHigh;
                     largeInteger.QuadPart += readByteCount;
-                    implPtr->overlapped_.Offset = largeInteger.LowPart;
-                    implPtr->overlapped_.OffsetHigh = largeInteger.HighPart;
+                    impl->overlapped_.Offset = largeInteger.LowPart;
+                    impl->overlapped_.OffsetHigh = largeInteger.HighPart;
                 }
             break;
             default:
@@ -508,7 +581,7 @@ kaphein_io_FileStream_read(
 
 enum kaphein_ErrorCode
 kaphein_io_FileStream_write(
-    void* thisObj
+    void * thisObj
     , const void * src
     , kaphein_SSize srcSize
     , kaphein_SSize * writtenByteCountOut
@@ -525,36 +598,36 @@ kaphein_io_FileStream_write(
 }
 
 enum kaphein_ErrorCode
-kaphein_io_FileStream_toConstStream(
-    const struct kaphein_io_FileStream * thisObj
-    , const struct kaphein_io_Stream ** streamOut
+kaphein_io_FileStream_seek(
+    void * thisObj
+    , kaphein_Int64 offset
+    , enum kaphein_io_SeekOrigin origin
+    , kaphein_Int64 * newPositionOut
 )
 {
+    struct kaphein_io_FileStream *const thisPtr = (struct kaphein_io_FileStream *)thisObj;
     enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
+    bool truth;
 
-    if(thisObj == KAPHEIN_NULL || streamOut == KAPHEIN_NULL) {
-        errorCode = kapheinErrorCodeArgumentNull;
+    if(offset >= MAXLONGLONG) {
+        errorCode = kapheinErrorCodeArgumentOutOfRange;
+    }
+    else if(kaphein_io_FileStream_isOpened(thisObj, &truth), !truth) {
+        errorCode = kapheinErrorCodeOperationInvalid;
     }
     else {
-        *streamOut = &thisObj->parent;
-    }
-
-    return errorCode;
-}
-
-enum kaphein_ErrorCode
-kaphein_io_FileStream_toStream(
-    struct kaphein_io_FileStream * thisObj
-    , struct kaphein_io_Stream ** streamOut
-)
-{
-    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
-
-    if(thisObj == KAPHEIN_NULL || streamOut == KAPHEIN_NULL) {
-        errorCode = kapheinErrorCodeArgumentNull;
-    }
-    else {
-        *streamOut = &thisObj->parent;
+        struct FileStream_Impl *const impl = (struct FileStream_Impl *)thisPtr->impl_;
+        LARGE_INTEGER distanceToMove, newPosition;
+        distanceToMove.QuadPart = (LONGLONG)offset;
+        
+        if(FALSE == SetFilePointerEx(impl->natvieHandle_, distanceToMove, &newPosition, toWinApiFileSeekOrigin(origin))) {
+            errorCode = kapheinErrorCodeOperationInvalid;
+        }
+        else {
+            if(KAPHEIN_NULL != newPositionOut) {
+                *newPositionOut = (kaphein_Int64)newPosition.QuadPart;
+            }
+        }
     }
 
     return errorCode;
