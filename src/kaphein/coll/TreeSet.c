@@ -18,7 +18,9 @@ enum RotationDirection
 };
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
-static bool RbTreeNode_isNil(
+static
+bool
+RbTreeNode_isNil(
     const struct RbTreeNode * pNode
 )
 {
@@ -26,7 +28,9 @@ static bool RbTreeNode_isNil(
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
-static bool RbTreeNode_isNullOrNil(
+static
+bool
+RbTreeNode_isNullOrNil(
     const struct RbTreeNode * pNode
 )
 {
@@ -34,7 +38,9 @@ static bool RbTreeNode_isNullOrNil(
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
-static bool RbTreeNode_hasNonNilLeftChild(
+static
+bool
+RbTreeNode_hasNonNilLeftChild(
     const struct RbTreeNode * pNode
 )
 {
@@ -44,7 +50,9 @@ static bool RbTreeNode_hasNonNilLeftChild(
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
-static bool RbTreeNode_hasNonNilRightChild(
+static
+bool
+RbTreeNode_hasNonNilRightChild(
     const struct RbTreeNode * pNode
 )
 {
@@ -54,7 +62,9 @@ static bool RbTreeNode_hasNonNilRightChild(
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
-static bool RbTreeNode_isNonNilLeaf(
+static
+bool
+RbTreeNode_isNonNilLeaf(
     const struct RbTreeNode * pNode
 )
 {
@@ -63,7 +73,9 @@ static bool RbTreeNode_isNonNilLeaf(
     ;
 }
 
-static struct RbTreeNode * RbTreeNode_getRoot(
+static
+struct RbTreeNode *
+RbTreeNode_getRoot(
     struct RbTreeNode * pNode
 )
 {
@@ -74,7 +86,9 @@ static struct RbTreeNode * RbTreeNode_getRoot(
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
-static struct RbTreeNode * RbTreeNode_getTheOtherChild(
+static
+struct RbTreeNode *
+RbTreeNode_getTheOtherChild(
     struct RbTreeNode * pParent,
     struct RbTreeNode * pNode
 )
@@ -91,7 +105,9 @@ static struct RbTreeNode * RbTreeNode_getTheOtherChild(
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
-static struct RbTreeNode * RbTreeNode_getLastChild(
+static
+struct RbTreeNode *
+RbTreeNode_getLastChild(
     struct RbTreeNode * pNode
 )
 {
@@ -103,7 +119,9 @@ static struct RbTreeNode * RbTreeNode_getLastChild(
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
-static struct RbTreeNode * RbTreeNode_getSibling(
+static
+struct RbTreeNode *
+RbTreeNode_getSibling(
     struct RbTreeNode * pNode
 )
 {
@@ -111,7 +129,9 @@ static struct RbTreeNode * RbTreeNode_getSibling(
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
-static struct RbTreeNode ** RbTreeNode_getChildSlot(
+static
+struct RbTreeNode **
+RbTreeNode_getChildSlot(
     struct RbTreeNode * pNode
 )
 {
@@ -127,7 +147,8 @@ static struct RbTreeNode ** RbTreeNode_getChildSlot(
     );
 }
 
-struct RbTreeNode * RbTreeNode_findLeftMost(
+struct RbTreeNode *
+RbTreeNode_findLeftMost(
     struct RbTreeNode * pNode
 )
 {
@@ -141,7 +162,8 @@ struct RbTreeNode * RbTreeNode_findLeftMost(
     return pCurrent;
 }
 
-struct RbTreeNode * RbTreeNode_findRightMost(
+struct RbTreeNode *
+RbTreeNode_findRightMost(
     struct RbTreeNode * pNode
 )
 {
@@ -155,7 +177,9 @@ struct RbTreeNode * RbTreeNode_findRightMost(
     return pCurrent;
 }
 
-static struct RbTreeNode * RbTreeNode_findLeftSubTreeRoot(
+static
+struct RbTreeNode *
+RbTreeNode_findLeftSubTreeRoot(
     struct RbTreeNode * pNode
 )
 {
@@ -173,7 +197,9 @@ static struct RbTreeNode * RbTreeNode_findLeftSubTreeRoot(
     return pCurrent;
 }
 
-static struct RbTreeNode * RbTreeNode_findRightSubTreeRoot(
+static
+struct RbTreeNode *
+RbTreeNode_findRightSubTreeRoot(
     struct RbTreeNode * pNode
 )
 {
@@ -191,7 +217,9 @@ static struct RbTreeNode * RbTreeNode_findRightSubTreeRoot(
     return pCurrent;
 }
 
-struct RbTreeNode * RbTreeNode_findLess(
+struct
+RbTreeNode *
+RbTreeNode_findLess(
     struct RbTreeNode * pNode
 )
 {
@@ -211,7 +239,9 @@ struct RbTreeNode * RbTreeNode_findLess(
     return pLess;
 }
 
-struct RbTreeNode * RbTreeNode_findGreater(
+struct
+RbTreeNode *
+RbTreeNode_findGreater(
     struct RbTreeNode * pNode
 )
 {
@@ -232,7 +262,9 @@ struct RbTreeNode * RbTreeNode_findGreater(
     return pGreater;
 }
 
-static int RbTreeNode_traverseByPostorder(
+static
+int
+RbTreeNode_traverseByPostorder(
     struct RbTreeNode * pNode,
     NodeTraversalHandlerPtr pHandler,
     void* pContext
@@ -287,7 +319,9 @@ static int RbTreeNode_traverseByPostorder(
     return stopTraversal;
 }
 
-static void RbTreeNode_rotate(
+static
+void
+RbTreeNode_rotate(
     struct RbTreeNode * pNode,
     enum RotationDirection direction
 )
@@ -320,7 +354,9 @@ static const struct RbTreeNode nilNode = {
     , 0
 };
 
-static struct RbTreeNode * kaphein_coll_TreeSet_createNode(
+static
+struct RbTreeNode *
+kaphein_coll_TreeSet_createNode(
     struct RbTreeNode * pParent,
     const void * pElement
 )
@@ -337,7 +373,9 @@ static struct RbTreeNode * kaphein_coll_TreeSet_createNode(
     return newNode;
 }
 
-static struct RbTreeNode * kaphein_coll_TreeSet_findNode(
+static
+struct RbTreeNode *
+kaphein_coll_TreeSet_findNode(
     const struct kaphein_coll_TreeSet * thisObj
     , const void * pElement
     , enum SearchTarget searchTarget
@@ -410,7 +448,9 @@ static struct RbTreeNode * kaphein_coll_TreeSet_findNode(
     return pCurrent;
 }
 
-static void kaphein_coll_TreeSet_rebalanceAfterInsertion(
+static
+void
+kaphein_coll_TreeSet_rebalanceAfterInsertion(
     struct kaphein_coll_TreeSet * thisObj,
     struct RbTreeNode * pTarget
 )
@@ -478,7 +518,9 @@ static void kaphein_coll_TreeSet_rebalanceAfterInsertion(
     }
 }
 
-static void kaphein_coll_TreeSet_rebalanceAfterRemoval(
+static
+void
+kaphein_coll_TreeSet_rebalanceAfterRemoval(
     struct kaphein_coll_TreeSet * thisObj,
     struct RbTreeNode * pReplacement
 )
@@ -595,21 +637,24 @@ kaphein_coll_TreeSet_construct(
     return kapheinErrorCodeNoError;
 }
 
-void kaphein_coll_TreeSet_destruct(
+void
+kaphein_coll_TreeSet_destruct(
     struct kaphein_coll_TreeSet * thisObj
 )
 {
     kaphein_coll_TreeSet_clear(thisObj);
 }
 
-kaphein_SSize kaphein_coll_TreeSet_getCount(
+kaphein_SSize
+kaphein_coll_TreeSet_getCount(
     const struct kaphein_coll_TreeSet * thisObj
 )
 {
     return thisObj->count_;
 }
 
-bool kaphein_coll_TreeSet_has(
+bool
+kaphein_coll_TreeSet_has(
     const struct kaphein_coll_TreeSet * thisObj
     , const void * pElement
 )
@@ -617,7 +662,8 @@ bool kaphein_coll_TreeSet_has(
     return kaphein_coll_TreeSet_findNode(thisObj, pElement, stEqual) != KAPHEIN_NULL;
 }
 
-struct RbTreeNode * kaphein_coll_TreeSet_add(
+struct RbTreeNode *
+kaphein_coll_TreeSet_add(
     struct kaphein_coll_TreeSet * thisObj
     , const void * pElement
 )
@@ -672,7 +718,8 @@ struct RbTreeNode * kaphein_coll_TreeSet_add(
     return newNode;
 }
 
-bool kaphein_coll_TreeSet_remove(
+bool
+kaphein_coll_TreeSet_remove(
     struct kaphein_coll_TreeSet * thisObj
     , const void * pElement
 )
@@ -749,7 +796,9 @@ bool kaphein_coll_TreeSet_remove(
     return removedNode != KAPHEIN_NULL;
 }
 
-static bool kaphein_coll_TreeSet_removeAllHandler(
+static
+bool
+kaphein_coll_TreeSet_removeAllHandler(
     void* pContext,
     struct RbTreeNode * pNode
 )
@@ -762,7 +811,8 @@ static bool kaphein_coll_TreeSet_removeAllHandler(
     return false;
 }
 
-void kaphein_coll_TreeSet_clear(
+void
+kaphein_coll_TreeSet_clear(
     struct kaphein_coll_TreeSet * thisObj
 )
 {

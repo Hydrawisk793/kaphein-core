@@ -36,7 +36,7 @@ isEmpty(
 
 static
 enum kaphein_ErrorCode
-reserveCapacity(
+resizeContainer(
     struct Vector_Impl * impl
     , kaphein_SSize newCapacity
 )
@@ -47,71 +47,144 @@ reserveCapacity(
         resultErrorCode = kapheinErrorCodeArgumentOutOfRange;
     }
     else {
-        if(newCapacity > impl->capacity_) {
-            char * newContainer = KAPHEIN_NULL;
-            char * src;
-            char * dest;
-            const kaphein_SSize elementSize = impl->elementTrait_->elementSize;
-            kaphein_SSize i;
-            int state;
+        char * newContainer = KAPHEIN_NULL;
+        char * src;
+        char * dest;
+        const kaphein_SSize currentElementCount = getCount(impl);
+        const kaphein_SSize elementSize = impl->elementTrait_->elementSize;
+        kaphein_SSize newEndIndex = impl->endIndex_;
+        kaphein_SSize i;
+        int state;
 
-            for(state = 4; kapheinErrorCodeNoError == resultErrorCode && state > 0; ) {
-                switch(state) {
-                case 4:
-                    newContainer = (char *)kaphein_mem_allocate(
-                        impl->allocator_
-                        , newCapacity * elementSize
-                        , KAPHEIN_NULL
-                        , &resultErrorCode
-                    );
+        for(state = 5; kapheinErrorCodeNoError == resultErrorCode && state > 0; ) {
+            switch(state) {
+            case 5:
+                newContainer = (char *)kaphein_mem_allocate(
+                    impl->allocator_
+                    , newCapacity * elementSize
+                    , KAPHEIN_NULL
+                    , &resultErrorCode
+                );
 
-                    #if defined(_DEBUG)
-                    if(kapheinErrorCodeNoError == resultErrorCode) {
-                        kaphein_mem_fill(
-                            newContainer
-                            , newCapacity * elementSize
-                            , 0xFF
-                            , newCapacity * elementSize
-                        );
-                    }
-                    #endif
-                break;
-                case 3:
-                    if(KAPHEIN_NULL != impl->begin_) {
-                        for(
-                            dest = newContainer, src = impl->begin_, i = getCount(impl);
-                            kapheinErrorCodeNoError == resultErrorCode && i > 0;
-                            dest += elementSize, src += elementSize
-                        ) {
-                            --i;
-
-                            resultErrorCode = (*impl->elementTrait_->copyConstruct)(dest, src, impl->allocator_);
-                    
-                            if(kapheinErrorCodeNoError == resultErrorCode) {
-                                resultErrorCode = (*impl->elementTrait_->destruct)(src);
-                            }
-                        }
-                    }
-                break;
-                case 2:
-                    if(KAPHEIN_NULL != impl->begin_) {
-                        resultErrorCode = kaphein_mem_deallocate(
-                            impl->allocator_
-                            , impl->begin_
-                            , impl->capacity_ * elementSize
-                        );
-                    }
-                break;
-                case 1:
-                    impl->begin_ = newContainer;
-                    impl->capacity_ = newCapacity;
-                break;
-                }
-
+                #if defined(_DEBUG)
                 if(kapheinErrorCodeNoError == resultErrorCode) {
-                    --state;
+                    kaphein_mem_fill(
+                        newContainer
+                        , newCapacity * elementSize
+                        , 0xFF
+                        , newCapacity * elementSize
+                    );
                 }
+                #endif
+            break;
+            case 4:
+                if(KAPHEIN_NULL != impl->begin_) {
+                    if(newCapacity < currentElementCount) {
+                        i = newCapacity;
+                        newEndIndex = newCapacity;
+                    }
+                    else {
+                        i = currentElementCount;
+                    }
+
+                    for(
+                        dest = newContainer, src = impl->begin_;
+                        kapheinErrorCodeNoError == resultErrorCode && i > 0;
+                        dest += elementSize, src += elementSize
+                    ) {
+                        --i;
+
+                        resultErrorCode = (*impl->elementTrait_->copyConstruct)(
+                            dest
+                            , src
+                            , impl->allocator_
+                        );
+                    }
+                }
+            break;
+            case 3:
+                for(
+                    src = impl->begin_, i = currentElementCount;
+                    kapheinErrorCodeNoError == resultErrorCode && i > 0;
+                    src += elementSize
+                ) {
+                    --i;
+                    
+                    resultErrorCode = (*impl->elementTrait_->destruct)(src);
+                }
+            break;
+            case 2:
+                if(KAPHEIN_NULL != impl->begin_) {
+                    resultErrorCode = kaphein_mem_deallocate(
+                        impl->allocator_
+                        , impl->begin_
+                        , impl->capacity_ * elementSize
+                    );
+                }
+            break;
+            case 1:
+                impl->begin_ = newContainer;
+                impl->capacity_ = newCapacity;
+                impl->endIndex_ = newEndIndex;
+            break;
             }
+
+            if(kapheinErrorCodeNoError == resultErrorCode) {
+                --state;
+            }
+        }
+    }
+
+    return resultErrorCode;
+}
+
+static
+enum kaphein_ErrorCode
+reserveCapacity(
+    struct Vector_Impl * impl
+    , kaphein_SSize newCapacity
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    
+    if(newCapacity > impl->capacity_) {
+        resultErrorCode = resizeContainer(impl, newCapacity);
+    }
+
+    return resultErrorCode;
+}
+
+static
+enum kaphein_ErrorCode
+expandContainerIfNeccesary(
+    struct Vector_Impl * impl
+    , kaphein_SSize minimumRequiredCapacity
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    const kaphein_SSize originalCapacity = impl->capacity_;
+    kaphein_SSize prevCapacity;
+    kaphein_SSize newCapacity = impl->capacity_;
+    
+    while(
+        newCapacity < KAPHEIN_SSIZE_MAXIMUM
+        && newCapacity < minimumRequiredCapacity
+    ) {
+        prevCapacity = newCapacity;
+        newCapacity <<= 1;
+
+        if((newCapacity >> 1) != prevCapacity) {
+            newCapacity = KAPHEIN_SSIZE_MAXIMUM;
+        }
+    }
+    
+    resultErrorCode = reserveCapacity(impl, newCapacity);
+    if(kapheinErrorCodeNoError == resultErrorCode) {
+        if(
+            minimumRequiredCapacity > originalCapacity
+            && originalCapacity >= impl->capacity_
+        ) {
+            resultErrorCode = kapheinErrorCodeCollectionOverflow;
         }
     }
 
@@ -201,7 +274,7 @@ shiftElementRight(
     for(state = 3; kapheinErrorCodeNoError == resultErrorCode && state > 0; ) {
         switch(state) {
         case 3:
-            resultErrorCode = reserveCapacity(impl, destEndIndex);
+            resultErrorCode = expandContainerIfNeccesary(impl, destEndIndex);
         break;
         case 2:
             if(elementCount > 0) {
@@ -376,6 +449,88 @@ kaphein_coll_Vector_destruct(
 }
 
 enum kaphein_ErrorCode
+kaphein_coll_Vector_getCapacity(
+    const struct kaphein_coll_Vector * thisObj
+    , kaphein_SSize * capacityOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == capacityOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct Vector_Impl *const impl = (const struct Vector_Impl *)thisObj->impl_;
+        
+        *capacityOut = impl->capacity_;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_Vector_resize(
+    struct kaphein_coll_Vector * thisObj
+    , kaphein_SSize size
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct Vector_Impl *const impl = (struct Vector_Impl *)thisObj->impl_;
+        
+        resultErrorCode = resizeContainer(impl, size);
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_Vector_reserve(
+    struct kaphein_coll_Vector * thisObj
+    , kaphein_SSize size
+)
+{
+    enum kaphein_ErrorCode resultErrorCode;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        resultErrorCode = reserveCapacity((struct Vector_Impl *)thisObj->impl_, size);
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_Vector_trim(
+    struct kaphein_coll_Vector * thisObj
+)
+{
+    enum kaphein_ErrorCode resultErrorCode;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct Vector_Impl *const impl = (struct Vector_Impl *)thisObj->impl_;
+        
+        resultErrorCode = resizeContainer(impl, getCount(impl));
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
 kaphein_coll_Vector_getPointerToElements(
     const struct kaphein_coll_Vector * thisObj
     , void ** pointerOut
@@ -425,23 +580,26 @@ kaphein_coll_Vector_isEmpty(
 }
 
 enum kaphein_ErrorCode
-kaphein_coll_Vector_getCapacity(
+kaphein_coll_Vector_isFull(
     const struct kaphein_coll_Vector * thisObj
-    , kaphein_SSize * capacityOut
+    , bool * truthOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
 
     if(
         KAPHEIN_NULL == thisObj
-        || KAPHEIN_NULL == capacityOut
+        || KAPHEIN_NULL == truthOut
     ) {
         resultErrorCode = kapheinErrorCodeArgumentNull;
     }
     else {
         const struct Vector_Impl *const impl = (const struct Vector_Impl *)thisObj->impl_;
         
-        *capacityOut = impl->capacity_;
+        //TODO : What does 'isFull' mean on vectors?
+        *truthOut = impl->capacity_ >= KAPHEIN_SSIZE_MAXIMUM
+            && impl->endIndex_ >= impl->capacity_
+        ;
     }
 
     return resultErrorCode;
@@ -471,21 +629,23 @@ kaphein_coll_Vector_getCount(
 }
 
 enum kaphein_ErrorCode
-kaphein_coll_Vector_reserve(
+kaphein_coll_Vector_pushFront(
     struct kaphein_coll_Vector * thisObj
-    , kaphein_SSize size
+    , const void * element
+    , kaphein_SSize elementSize
 )
 {
-    enum kaphein_ErrorCode resultErrorCode;
+    return kaphein_coll_Vector_insert(thisObj, 0, element, elementSize, 1);
+}
 
-    if(KAPHEIN_NULL == thisObj) {
-        resultErrorCode = kapheinErrorCodeArgumentNull;
-    }
-    else {
-        resultErrorCode = reserveCapacity((struct Vector_Impl *)thisObj->impl_, size);
-    }
-
-    return resultErrorCode;
+enum kaphein_ErrorCode
+kaphein_coll_Vector_popFront(
+    struct kaphein_coll_Vector * thisObj
+    , void * elementOut
+    , kaphein_SSize elementOutSize
+)
+{
+    return kaphein_coll_Vector_remove(thisObj, 0, 1, elementOut, elementOutSize);
 }
 
 enum kaphein_ErrorCode
@@ -507,8 +667,7 @@ kaphein_coll_Vector_pushBack(
             resultErrorCode = kapheinErrorCodeNotEnoughBufferSpace;
         }
         else {
-            //TODO : 현재 용량의 2배로 늘어나게 조정.
-            resultErrorCode = reserveCapacity(impl, getCount(impl) + 1);
+            resultErrorCode = expandContainerIfNeccesary(impl, getCount(impl) + 1);
             if(kapheinErrorCodeNoError == resultErrorCode) {
                 resultErrorCode = (*impl->elementTrait_->copyConstruct)(
                     impl->begin_ + (impl->endIndex_ * impl->elementTrait_->elementSize)
@@ -624,6 +783,100 @@ kaphein_coll_Vector_insert(
                         , impl->allocator_
                     );
                 }
+            }
+        }
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_Vector_remove(
+    struct kaphein_coll_Vector * thisObj
+    , kaphein_SSize index
+    , kaphein_SSize count
+    , void * elementsOut
+    , kaphein_SSize elementsOutSize
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct Vector_Impl *const impl = (struct Vector_Impl *)thisObj->impl_;
+        const kaphein_SSize elementSize = impl->elementTrait_->elementSize;
+        const kaphein_SSize currentElementCount = getCount(impl);
+        kaphein_SSize i;
+        char *const srcBegin = impl->begin_ + index * elementSize;
+        char * src;
+        char * dest;
+        int state;
+
+        for(state = 5; resultErrorCode == kapheinErrorCodeNoError && state > 0; ) {
+            switch(state) {
+            case 5:
+                if(
+                    (index < 0 || index >= currentElementCount)
+                    || (count < 0 || index + count > currentElementCount)
+                ) {
+                    resultErrorCode = kapheinErrorCodeArgumentOutOfRange;
+                }
+            break;
+            case 4:
+                if(
+                    KAPHEIN_NULL != elementsOut
+                    && elementsOutSize <  count * elementSize
+                ) {
+                    resultErrorCode = kapheinErrorCodeNotEnoughBufferSpace;
+                }
+            break;
+            case 3:
+                if(KAPHEIN_NULL != elementsOut) {
+                    for(
+                        dest = (char *)elementsOut, src = srcBegin, i = count;
+                        resultErrorCode == kapheinErrorCodeNoError && i > 0;
+                        dest += elementSize, src += elementSize
+                    ) {
+                        --i;
+
+                        resultErrorCode = (*impl->elementTrait_->copyConstruct)(
+                            dest
+                            , src
+                            , impl->allocator_
+                        );
+                    }
+                }
+            break;
+            case 2:
+                if(index + count < impl->endIndex_) {
+                    resultErrorCode = shiftElementLeft(
+                        impl
+                        , index + count
+                        , impl->endIndex_
+                        , count
+                    );
+                }
+                else {
+                    for(
+                        src = srcBegin, i = count;
+                        resultErrorCode == kapheinErrorCodeNoError && i > 0;
+                        src += elementSize
+                    ) {
+                        --i;
+
+                        resultErrorCode = (*impl->elementTrait_->destruct)(src);
+                    }
+                }
+            break;
+            case 1:
+                impl->endIndex_ -= count;
+            break;
+            }
+
+            if(resultErrorCode == kapheinErrorCodeNoError) {
+                --state;
             }
         }
     }
