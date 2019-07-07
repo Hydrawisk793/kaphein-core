@@ -6,10 +6,7 @@
 
 struct kaphein_io_Stream_VTable
 {
-    enum kaphein_ErrorCode
-    (* destruct) (
-        void * thisObj
-    );
+    kaphein_destructFunction * destruct;
 
     enum kaphein_ErrorCode
     (* isOpened) (

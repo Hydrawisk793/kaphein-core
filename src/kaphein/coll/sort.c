@@ -10,12 +10,15 @@ testSortFunctionArguments(
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeUnknownError;
 
-    if(elementTrait == KAPHEIN_NULL || elements == KAPHEIN_NULL) {
+    if(
+        KAPHEIN_NULL == elementTrait
+        || KAPHEIN_NULL == elements
+    ) {
         resultErrorCode = kapheinErrorCodeArgumentNull;
     }
     else if(
-        elementTrait->compare == KAPHEIN_NULL
-        || elementTrait->swap == KAPHEIN_NULL
+        KAPHEIN_NULL == elementTrait->compare 
+        || KAPHEIN_NULL == elementTrait->swap
         || elementTrait->elementSize < 0
     ) {
         resultErrorCode = kapheinErrorCodeArgumentInvalid;

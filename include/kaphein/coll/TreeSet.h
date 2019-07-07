@@ -1,73 +1,17 @@
 #ifndef KAPHEIN_HGRD_kaphein_coll_TreeSet_h
 #define KAPHEIN_HGRD_kaphein_coll_TreeSet_h
 
+#include "../mem/Allocator.h"
 #include "def.h"
+#include "Iterator.h"
 
-enum SearchTarget
-{
-    stNotGreater
-    , stLess
-    , stNotLess
-    , stGreater
-    , stEqual
-};
+struct kaphein_coll_TreeSet;
 
-struct RbTreeNode
-{
-    const void * pElement_;
-
-    struct RbTreeNode * pParent_;
-
-    union
-    {
-        struct RbTreeNode * ptrs_[2];
-
-        struct {
-            struct RbTreeNode * pLeft_;
-
-            struct RbTreeNode * pRight_;
-        } pair_;
-
-    } child_;
-
-    char red_;
-};
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-struct RbTreeNode *
-RbTreeNode_findLeftMost(
-    struct RbTreeNode * pNode
-);
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-struct RbTreeNode *
-RbTreeNode_findRightMost(
-    struct RbTreeNode * pNode
-);
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-struct RbTreeNode *
-RbTreeNode_findLess(
-    struct RbTreeNode * pNode
-);
-
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-struct RbTreeNode *
-RbTreeNode_findGreater(
-    struct RbTreeNode * pNode
-);
+struct kaphein_coll_TreeSet_Iterator;
 
 struct kaphein_coll_TreeSet
 {
-    struct RbTreeNode * pRoot_;
-    
-    kaphein_SSize count_;
-    
-    kaphein_coll_compareFunction * pComparator_;
+    void * impl_;
 };
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
@@ -75,83 +19,158 @@ KAPHEIN_ATTRIBUTE_DLL_API
 enum kaphein_ErrorCode
 kaphein_coll_TreeSet_construct(
     struct kaphein_coll_TreeSet * thisObj
-    , kaphein_coll_compareFunction * pComparator
+    , const struct kaphein_coll_ElementTrait * elementTrait
+    , struct kaphein_mem_Allocator * allocator
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
-void
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_destruct(
     struct kaphein_coll_TreeSet * thisObj
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
-kaphein_SSize
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_getCount(
     const struct kaphein_coll_TreeSet * thisObj
+    , kaphein_SSize * countOut
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
-bool
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_isEmpty(
+    const struct kaphein_coll_TreeSet * thisObj
+    , bool * truthOut
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_getBeginConstIterator(
+    const struct kaphein_coll_TreeSet * thisObj
+    , struct kaphein_coll_TreeSet_Iterator * iterOut
+);
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_getEndConstIterator(
+    const struct kaphein_coll_TreeSet * thisObj
+    , struct kaphein_coll_TreeSet_Iterator * iterOut
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_has(
     const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-);
-
-bool
-kaphein_coll_TreeSet_findLessThan(
-    const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-    , void * foundElementsOut
-    , kaphein_SSize * foundElementCountInOut
-);
-
-bool
-kaphein_coll_TreeSet_findNotGreaterThan(
-    const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-    , void * foundElementsOut
-    , kaphein_SSize * foundElementCountInOut
-);
-
-bool
-kaphein_coll_TreeSet_findGreaterThan(
-    const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-    , void * foundElementsOut
-    , kaphein_SSize * foundElementCountInOut
-);
-
-bool
-kaphein_coll_TreeSet_findNotLessThan(
-    const struct kaphein_coll_TreeSet* thisObj
-    , const void * pElement
-    , void * foundElementsOut
-    , kaphein_SSize * foundElementCountInOut
+    , const void * element
+    , bool * truthOut
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
-struct RbTreeNode *
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_add(
     struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
+    , const void * element
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_remove(
+    struct kaphein_coll_TreeSet * thisObj
+    , const void * element
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_clear(
+    struct kaphein_coll_TreeSet * thisObj
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_toArray(
+    const struct kaphein_coll_TreeSet * thisObj
+    , void * elementsOut
+    , kaphein_SSize elementsOutSize
+);
+
+struct kaphein_coll_TreeSet_Iterator
+{
+    struct kaphein_coll_Iterator parent;
+
+    const struct kaphein_coll_TreeSet * treeSet_;
+
+    const void * currentNode_;
+};
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_copyConstruct(
+    void * thisObj
+    , const void * src
+    , struct kaphein_mem_Allocator * allocator
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_destruct(
+    void * thisObj
+);
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_copyAssign(
+    void * thisObj
+    , const void * src
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+const void *
+kaphein_coll_TreeSet_Iterator_dereferenceConst(
+    const void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
+);
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_hasReachedBegin(
+    const void * thisObj
+    , bool * truthOut
+);
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_hasReachedEnd(
+    const void * thisObj
+    , bool * truthOut
+);
+
+KAPHEIN_ATTRIBUTE_C_LINKAGE
+KAPHEIN_ATTRIBUTE_DLL_API
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_reset(
+    void * thisObj
 );
 
 KAPHEIN_ATTRIBUTE_C_LINKAGE
 KAPHEIN_ATTRIBUTE_DLL_API
 bool
-kaphein_coll_TreeSet_remove(
-    struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
+kaphein_coll_TreeSet_Iterator_moveToNext(
+    void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
 );
 
-KAPHEIN_ATTRIBUTE_C_LINKAGE
-KAPHEIN_ATTRIBUTE_DLL_API
-void kaphein_coll_TreeSet_clear(
-    struct kaphein_coll_TreeSet * thisObj
+bool
+kaphein_coll_TreeSet_Iterator_moveToPrevious(
+    void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
 );
 
 #endif

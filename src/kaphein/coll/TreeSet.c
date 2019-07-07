@@ -1,104 +1,150 @@
-#ifdef _DEBUG
+#if defined(_DEBUG)
+    #include <stdlib.h>
     #include <stdio.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
+#include "kaphein/mem/utils.h"
 #include "kaphein/coll/List.h"
 #include "kaphein/coll/TreeSet.h"
 
-typedef bool (* NodeTraversalHandlerPtr) (
-    void *
-    , struct RbTreeNode *
-);
+/* **************************************************************** */
+/* TreeSet_Node */
 
-enum RotationDirection
+struct TreeSet_Impl
+{
+    struct kaphein_mem_Allocator * allocator_;
+
+    const struct kaphein_coll_ElementTrait * elementTrait_;
+
+    struct TreeSet_Node * root_;
+
+    kaphein_SSize elementCount_;
+};
+
+struct TreeSet_Node
+{
+    struct TreeSet_Node * parent_;
+    
+    void * element_;
+
+    union
+    {
+        struct TreeSet_Node * children_[2];
+
+        struct {
+            struct TreeSet_Node * left_;
+
+            struct TreeSet_Node * right_;
+        } pair_;
+    } child_;
+
+    bool isRed_;
+};
+
+enum TreeSet_Node_RotationDirection
 {
     rdLeft = 0
     , rdRight = 1
 };
 
+typedef
+bool
+TreeSet_Node_TraversalHandler(
+    void *
+    , struct TreeSet_Node *
+);
+
+static
+const struct TreeSet_Node nilNode = {
+    KAPHEIN_NULL
+    , KAPHEIN_NULL
+    , KAPHEIN_NULL
+    , KAPHEIN_NULL
+    , false
+};
+
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
 bool
-RbTreeNode_isNil(
-    const struct RbTreeNode * pNode
+TreeSet_Node_isNil(
+    const struct TreeSet_Node * pNode
 )
 {
-    return pNode->pElement_ == KAPHEIN_NULL;
+    return pNode->element_ == KAPHEIN_NULL;
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
 bool
-RbTreeNode_isNullOrNil(
-    const struct RbTreeNode * pNode
+TreeSet_Node_isNullOrNil(
+    const struct TreeSet_Node * pNode
 )
 {
-    return pNode == KAPHEIN_NULL || RbTreeNode_isNil(pNode);
+    return pNode == KAPHEIN_NULL || TreeSet_Node_isNil(pNode);
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
 bool
-RbTreeNode_hasNonNilLeftChild(
-    const struct RbTreeNode * pNode
+TreeSet_Node_hasNonNilLeftChild(
+    const struct TreeSet_Node * pNode
 )
 {
-    return pNode->child_.pair_.pLeft_ != KAPHEIN_NULL
-        && !RbTreeNode_isNil(pNode->child_.pair_.pLeft_)
+    return pNode->child_.pair_.left_ != KAPHEIN_NULL
+        && !TreeSet_Node_isNil(pNode->child_.pair_.left_)
     ;
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
 bool
-RbTreeNode_hasNonNilRightChild(
-    const struct RbTreeNode * pNode
+TreeSet_Node_hasNonNilRightChild(
+    const struct TreeSet_Node * pNode
 )
 {
-    return pNode->child_.pair_.pRight_ != KAPHEIN_NULL
-        && !RbTreeNode_isNil(pNode->child_.pair_.pRight_)
+    return pNode->child_.pair_.right_ != KAPHEIN_NULL
+        && !TreeSet_Node_isNil(pNode->child_.pair_.right_)
     ;
 }
 
 KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
 bool
-RbTreeNode_isNonNilLeaf(
-    const struct RbTreeNode * pNode
+TreeSet_Node_isNonNilLeaf(
+    const struct TreeSet_Node * pNode
 )
 {
-    return !RbTreeNode_hasNonNilLeftChild(pNode)
-        && !RbTreeNode_hasNonNilRightChild(pNode)
+    return !TreeSet_Node_hasNonNilLeftChild(pNode)
+        && !TreeSet_Node_hasNonNilRightChild(pNode)
     ;
 }
 
 static
-struct RbTreeNode *
-RbTreeNode_getRoot(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_getRoot(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pRoot = pNode;
-    for(; pRoot->pParent_ != KAPHEIN_NULL; pRoot = pRoot->pParent_);
+    struct TreeSet_Node * pRoot;
+
+    for(pRoot = pNode; pRoot->parent_ != KAPHEIN_NULL; pRoot = pRoot->parent_);
 
     return pRoot;
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
 static
-struct RbTreeNode *
-RbTreeNode_getTheOtherChild(
-    struct RbTreeNode * pParent,
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_getTheOtherChild(
+    struct TreeSet_Node * pParent
+    , struct TreeSet_Node * pNode
 )
 {
     return (
         pParent != KAPHEIN_NULL
         ? (
-            pNode == pParent->child_.pair_.pLeft_
-            ? pParent->child_.pair_.pRight_
-            : pParent->child_.pair_.pLeft_
+            pNode == pParent->child_.pair_.left_
+            ? pParent->child_.pair_.right_
+            : pParent->child_.pair_.left_
         )
         : KAPHEIN_NULL
     );
@@ -106,88 +152,92 @@ RbTreeNode_getTheOtherChild(
 
 KAPHEIN_ATTRIBUTE_INLINE
 static
-struct RbTreeNode *
-RbTreeNode_getLastChild(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_getLastChild(
+    struct TreeSet_Node * pNode
 )
 {
     return (
-        !RbTreeNode_isNullOrNil(pNode->child_.pair_.pRight_)
-        ? pNode->child_.pair_.pRight_
-        : pNode->child_.pair_.pLeft_
+        !TreeSet_Node_isNullOrNil(pNode->child_.pair_.right_)
+        ? pNode->child_.pair_.right_
+        : pNode->child_.pair_.left_
     );
 }
 
-KAPHEIN_ATTRIBUTE_INLINE
+KAPHEIN_ATTRIBUTE_FORCE_INLINE
 static
-struct RbTreeNode *
-RbTreeNode_getSibling(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_getSibling(
+    struct TreeSet_Node * pNode
 )
 {
-    return RbTreeNode_getTheOtherChild(pNode->pParent_, pNode);
+    return TreeSet_Node_getTheOtherChild(pNode->parent_, pNode);
 }
 
 KAPHEIN_ATTRIBUTE_INLINE
 static
-struct RbTreeNode **
-RbTreeNode_getChildSlot(
-    struct RbTreeNode * pNode
+struct TreeSet_Node **
+TreeSet_Node_getChildSlot(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * const pParent = pNode->pParent_;
+    struct TreeSet_Node * const pParent = pNode->parent_;
+
     return (
         pParent != KAPHEIN_NULL
         ? (
-            pNode == pParent->child_.pair_.pLeft_
-            ? &(pParent->child_.pair_.pLeft_)
-            : &(pParent->child_.pair_.pRight_)
+            pNode == pParent->child_.pair_.left_
+            ? &(pParent->child_.pair_.left_)
+            : &(pParent->child_.pair_.right_)
         )
         : KAPHEIN_NULL
     );
 }
 
-struct RbTreeNode *
-RbTreeNode_findLeftMost(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_findLeftMost(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pCurrent = pNode;
+    struct TreeSet_Node * pCurrent;
+
     for(
-        ;
-        pCurrent != KAPHEIN_NULL && RbTreeNode_hasNonNilLeftChild(pCurrent);
-        pCurrent = pCurrent->child_.pair_.pLeft_
+        pCurrent = pNode;
+        pCurrent != KAPHEIN_NULL && TreeSet_Node_hasNonNilLeftChild(pCurrent);
+        pCurrent = pCurrent->child_.pair_.left_
     );
 
     return pCurrent;
 }
 
-struct RbTreeNode *
-RbTreeNode_findRightMost(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_findRightMost(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pCurrent = pNode;
+    struct TreeSet_Node * pCurrent;
+
     for(
-        ;
-        pCurrent != KAPHEIN_NULL && RbTreeNode_hasNonNilRightChild(pCurrent);
-        pCurrent = pCurrent->child_.pair_.pRight_
+        pCurrent = pNode;
+        pCurrent != KAPHEIN_NULL && TreeSet_Node_hasNonNilRightChild(pCurrent);
+        pCurrent = pCurrent->child_.pair_.right_
     );
 
     return pCurrent;
 }
 
 static
-struct RbTreeNode *
-RbTreeNode_findLeftSubTreeRoot(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_findLeftSubTreeRoot(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pCurrent = pNode;
-    struct RbTreeNode * pParent;
+    struct TreeSet_Node * pCurrent = pNode;
+    struct TreeSet_Node * pParent;
+
     while(pCurrent != KAPHEIN_NULL) {
-        pParent = pCurrent->pParent_;
-        if(pParent == KAPHEIN_NULL || pCurrent == pParent->child_.pair_.pLeft_) {
+        pParent = pCurrent->parent_;
+        if(pParent == KAPHEIN_NULL || pCurrent == pParent->child_.pair_.left_) {
             break;
         }
 
@@ -198,16 +248,17 @@ RbTreeNode_findLeftSubTreeRoot(
 }
 
 static
-struct RbTreeNode *
-RbTreeNode_findRightSubTreeRoot(
-    struct RbTreeNode * pNode
+struct TreeSet_Node *
+TreeSet_Node_findRightSubTreeRoot(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pCurrent = pNode;
-    struct RbTreeNode * pParent;
+    struct TreeSet_Node * pCurrent = pNode;
+    struct TreeSet_Node * pParent;
+
     while(pCurrent != KAPHEIN_NULL) {
-        pParent = pCurrent->pParent_;
-        if(pParent == KAPHEIN_NULL || pCurrent == pParent->child_.pair_.pRight_) {
+        pParent = pCurrent->parent_;
+        if(pParent == KAPHEIN_NULL || pCurrent == pParent->child_.pair_.right_) {
             break;
         }
 
@@ -218,21 +269,21 @@ RbTreeNode_findRightSubTreeRoot(
 }
 
 struct
-RbTreeNode *
-RbTreeNode_findLess(
-    struct RbTreeNode * pNode
+TreeSet_Node *
+TreeSet_Node_findLess(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pLess = KAPHEIN_NULL;
-    struct RbTreeNode * pRstRoot = KAPHEIN_NULL;
+    struct TreeSet_Node * pLess = KAPHEIN_NULL;
+    struct TreeSet_Node * pRstRoot = KAPHEIN_NULL;
     
-    if(RbTreeNode_hasNonNilLeftChild(pNode)) {
-        pLess = RbTreeNode_findRightMost(pNode->child_.pair_.pLeft_);
+    if(TreeSet_Node_hasNonNilLeftChild(pNode)) {
+        pLess = TreeSet_Node_findRightMost(pNode->child_.pair_.left_);
     }
     else {
-        pRstRoot = RbTreeNode_findRightSubTreeRoot(pNode);
+        pRstRoot = TreeSet_Node_findRightSubTreeRoot(pNode);
         if(pRstRoot != KAPHEIN_NULL) {
-            pLess = pRstRoot->pParent_;
+            pLess = pRstRoot->parent_;
         }
     }
 
@@ -240,22 +291,22 @@ RbTreeNode_findLess(
 }
 
 struct
-RbTreeNode *
-RbTreeNode_findGreater(
-    struct RbTreeNode * pNode
+TreeSet_Node *
+TreeSet_Node_findGreater(
+    struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * pGreater = KAPHEIN_NULL;
+    struct TreeSet_Node * pGreater = KAPHEIN_NULL;
 
-    if(!RbTreeNode_isNil(pNode->child_.pair_.pRight_)) {
-        pGreater = RbTreeNode_findLeftMost(pNode->child_.pair_.pRight_);
+    if(!TreeSet_Node_isNil(pNode->child_.pair_.right_)) {
+        pGreater = TreeSet_Node_findLeftMost(pNode->child_.pair_.right_);
     }
-    else if(pNode->pParent_ != KAPHEIN_NULL) {
-        if(pNode == pNode->pParent_->child_.pair_.pLeft_) {
-            pGreater = pNode->pParent_;
+    else if(pNode->parent_ != KAPHEIN_NULL) {
+        if(pNode == pNode->parent_->child_.pair_.left_) {
+            pGreater = pNode->parent_;
         }
         else {
-            pGreater = RbTreeNode_findLeftSubTreeRoot(pNode)->pParent_;
+            pGreater = TreeSet_Node_findLeftSubTreeRoot(pNode)->parent_;
         }
     }
 
@@ -264,20 +315,20 @@ RbTreeNode_findGreater(
 
 static
 int
-RbTreeNode_traverseByPostorder(
-    struct RbTreeNode * pNode,
-    NodeTraversalHandlerPtr pHandler,
-    void* pContext
+TreeSet_Node_traverseByPostorder(
+    struct TreeSet_Node * pNode
+    , TreeSet_Node_TraversalHandler * pHandler
+    , void * pContext
 )
 {
-    struct RbTreeNode * pCurrent;
-    struct RbTreeNode * pLastTraversed = KAPHEIN_NULL;
+    struct TreeSet_Node * pCurrent;
+    struct TreeSet_Node * pLastTraversed = KAPHEIN_NULL;
     struct kaphein_coll_List nodeStack;
-    bool truth;
-    bool stopTraversal = false;
-    //int childCount;
     kaphein_UIntPtr listElement;
     kaphein_SSize listElementSize = 0;
+    //int childCount;
+    bool truth;
+    bool stopTraversal = false;
 
     kaphein_coll_List_construct(&nodeStack, KAPHEIN_NULL, KAPHEIN_NULL);
 
@@ -287,21 +338,21 @@ RbTreeNode_traverseByPostorder(
     while(!stopTraversal && !(kaphein_coll_List_isEmpty(&nodeStack, &truth), truth)) {
         listElementSize = KAPHEIN_ssizeof(listElement);
         kaphein_coll_List_peekBack(&nodeStack, &listElement, &listElementSize);
-        pCurrent = (struct RbTreeNode *)listElement;
+        pCurrent = (struct TreeSet_Node *)listElement;
         
         //childCount = 0;
         if(
-            !RbTreeNode_isNonNilLeaf(pCurrent)
-            && RbTreeNode_getLastChild(pCurrent) != pLastTraversed
+            !TreeSet_Node_isNonNilLeaf(pCurrent)
+            && TreeSet_Node_getLastChild(pCurrent) != pLastTraversed
         ) {
-            if(!RbTreeNode_isNullOrNil(pCurrent->child_.pair_.pRight_)) {
-                listElement = (kaphein_UIntPtr)pCurrent->child_.pair_.pRight_;
+            if(!TreeSet_Node_isNullOrNil(pCurrent->child_.pair_.right_)) {
+                listElement = (kaphein_UIntPtr)pCurrent->child_.pair_.right_;
                 kaphein_coll_List_pushBack(&nodeStack, &listElement, KAPHEIN_ssizeof(listElement));
                 //++childCount;
             }
 
-            if(!RbTreeNode_isNullOrNil(pCurrent->child_.pair_.pLeft_)) {
-                listElement = (kaphein_UIntPtr)pCurrent->child_.pair_.pLeft_;
+            if(!TreeSet_Node_isNullOrNil(pCurrent->child_.pair_.left_)) {
+                listElement = (kaphein_UIntPtr)pCurrent->child_.pair_.left_;
                 kaphein_coll_List_pushBack(&nodeStack, &listElement, KAPHEIN_ssizeof(listElement));
                 //++childCount;
             }
@@ -321,125 +372,473 @@ RbTreeNode_traverseByPostorder(
 
 static
 void
-RbTreeNode_rotate(
-    struct RbTreeNode * pNode,
-    enum RotationDirection direction
+TreeSet_Node_rotate(
+    struct TreeSet_Node * pNode
+    , enum TreeSet_Node_RotationDirection direction
 )
 {
     const int dirNdx = direction & 0x01;
     const int otherDirNdx = ~dirNdx & 0x01;
-    struct RbTreeNode ** pChildSlot = RbTreeNode_getChildSlot(pNode);
-    struct RbTreeNode * const pParent = pNode->pParent_;
-    struct RbTreeNode * const pLeftChildOfRightChild = pNode->child_.ptrs_[otherDirNdx]->child_.ptrs_[dirNdx];
+    struct TreeSet_Node ** pChildSlot = TreeSet_Node_getChildSlot(pNode);
+    struct TreeSet_Node * const pParent = pNode->parent_;
+    struct TreeSet_Node * const pLeftChildOfRightChild = pNode->child_.children_[otherDirNdx]->child_.children_[dirNdx];
 
-    pNode->child_.ptrs_[otherDirNdx]->child_.ptrs_[dirNdx] = pNode;
-    pNode->pParent_ = pNode->child_.ptrs_[otherDirNdx];
+    pNode->child_.children_[otherDirNdx]->child_.children_[dirNdx] = pNode;
+    pNode->parent_ = pNode->child_.children_[otherDirNdx];
 
-    pNode->child_.ptrs_[otherDirNdx]->pParent_ = pParent;
+    pNode->child_.children_[otherDirNdx]->parent_ = pParent;
     if(pChildSlot != KAPHEIN_NULL) {
-        *pChildSlot = pNode->child_.ptrs_[otherDirNdx];
+        *pChildSlot = pNode->child_.children_[otherDirNdx];
     }
 
-    pNode->child_.ptrs_[otherDirNdx] = pLeftChildOfRightChild;
-    if(!RbTreeNode_isNil(pLeftChildOfRightChild)) {
-        pLeftChildOfRightChild->pParent_ = pNode;
+    pNode->child_.children_[otherDirNdx] = pLeftChildOfRightChild;
+    if(!TreeSet_Node_isNil(pLeftChildOfRightChild)) {
+        pLeftChildOfRightChild->parent_ = pNode;
     }
 }
 
-static const struct RbTreeNode nilNode = {
-    KAPHEIN_NULL
+/* **************************************************************** */
+
+/* **************************************************************** */
+/* kaphein_coll_TreeSet_Iterator */
+
+static
+const struct kaphein_coll_Iterator_VTable iteratorParentVTable = {
+    kaphein_coll_TreeSet_Iterator_copyConstruct
+    , kaphein_coll_TreeSet_Iterator_destruct
+    , kaphein_coll_TreeSet_Iterator_copyAssign
     , KAPHEIN_NULL
+    , kaphein_coll_TreeSet_Iterator_dereferenceConst
     , KAPHEIN_NULL
+    , kaphein_coll_TreeSet_Iterator_hasReachedBegin
+    , kaphein_coll_TreeSet_Iterator_hasReachedEnd
+    , kaphein_coll_TreeSet_Iterator_reset
+    , kaphein_coll_TreeSet_Iterator_moveToNext
+    , kaphein_coll_TreeSet_Iterator_moveToPrevious
     , KAPHEIN_NULL
-    , 0
+};
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_copyConstruct(
+    void * thisObj
+    , const void * src
+    , struct kaphein_mem_Allocator * allocator
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    KAPHEIN_x_UNUSED_PARAMETER(allocator)
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == src
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+        struct kaphein_coll_TreeSet_Iterator *const srcPtr = (struct kaphein_coll_TreeSet_Iterator *)src;
+
+        srcPtr->parent.thisObj = srcPtr;
+        srcPtr->parent.vTable = thisPtr->parent.vTable;
+        srcPtr->treeSet_ = thisPtr->treeSet_;
+        srcPtr->currentNode_ = thisPtr->currentNode_;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_destruct(
+    void * thisObj
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+
+        thisPtr->treeSet_ = KAPHEIN_NULL;
+        thisPtr->currentNode_ = KAPHEIN_NULL;
+        thisPtr->parent.thisObj = KAPHEIN_NULL;
+        thisPtr->parent.vTable = KAPHEIN_NULL;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_copyAssign(
+    void * thisObj
+    , const void * src
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+
+        //TODO : 内靛 累己
+    }
+
+    return resultErrorCode;
+}
+
+const void *
+kaphein_coll_TreeSet_Iterator_dereferenceConst(
+    const void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    const void * element = KAPHEIN_NULL;
+
+    if(KAPHEIN_NULL == thisObj ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct kaphein_coll_TreeSet_Iterator *const thisPtr = (const struct kaphein_coll_TreeSet_Iterator *)thisObj;
+        
+        if(KAPHEIN_NULL == thisPtr->treeSet_) {
+            resultErrorCode = kapheinErrorCodeOperationInvalid;
+        }
+        else {
+            const struct TreeSet_Node *const node = (const struct TreeSet_Node *)thisPtr->currentNode_;
+
+            if(KAPHEIN_NULL == node) {
+                resultErrorCode = kapheinErrorCodeOperationInvalid;
+            }
+            else {
+                element = node->element_;
+            }
+        }
+    }
+
+    if(KAPHEIN_NULL != errorCodeOut) {
+        *errorCodeOut = resultErrorCode;
+    }
+
+    return element;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_hasReachedBegin(
+    const void * thisObj
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+
+        //TODO : 内靛 累己
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_hasReachedEnd(
+    const void * thisObj
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == truthOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+
+        *truthOut = KAPHEIN_NULL != thisPtr->treeSet_
+            && KAPHEIN_NULL == thisPtr->currentNode_
+        ;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_Iterator_reset(
+    void * thisObj
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+        
+        if(KAPHEIN_NULL == thisPtr->treeSet_) {
+            resultErrorCode = kapheinErrorCodeOperationInvalid;
+        }
+        else {
+            struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisPtr->treeSet_->impl_;
+
+            if(KAPHEIN_NULL == impl) {
+                resultErrorCode = kapheinErrorCodeOperationInvalid;
+            }
+            else {
+                thisPtr->currentNode_ = (const void *)TreeSet_Node_findLeftMost(impl->root_);
+            }
+        }
+    }
+
+    return resultErrorCode;
+}
+
+bool
+kaphein_coll_TreeSet_Iterator_moveToNext(
+    void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    bool hasReachedEnd = false;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+        
+        if(KAPHEIN_NULL != thisPtr->currentNode_) {
+            thisPtr->currentNode_ = (const void *)TreeSet_Node_findGreater((struct TreeSet_Node *)((void *)thisPtr->currentNode_));
+        }
+    }
+
+    if(KAPHEIN_NULL != errorCodeOut) {
+        *errorCodeOut = resultErrorCode;
+    }
+
+    return hasReachedEnd;
+}
+
+bool
+kaphein_coll_TreeSet_Iterator_moveToPrevious(
+    void * thisObj
+    , enum kaphein_ErrorCode * errorCodeOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    bool hasReachedBegin = false;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct kaphein_coll_TreeSet_Iterator *const thisPtr = (struct kaphein_coll_TreeSet_Iterator *)thisObj;
+        
+        if(KAPHEIN_NULL == thisPtr->currentNode_) {
+            thisPtr->currentNode_ = (const void *)TreeSet_Node_findRightMost((struct TreeSet_Node *)((void *)thisPtr->currentNode_));
+        }
+        else {
+            thisPtr->currentNode_ = (const void *)TreeSet_Node_findLess((struct TreeSet_Node *)((void *)thisPtr->currentNode_));
+        }
+    }
+
+    if(KAPHEIN_NULL != errorCodeOut) {
+        *errorCodeOut = resultErrorCode;
+    }
+
+    return hasReachedBegin;
+}
+
+/* **************************************************************** */
+
+/* **************************************************************** */
+/* TreeSet_Impl */
+
+enum TreeSet_Impl_SearchTarget
+{
+    stNotGreater = 0
+    , stLess
+    , stNotLess
+    , stGreater
+    , stEqual
 };
 
 static
-struct RbTreeNode *
-kaphein_coll_TreeSet_createNode(
-    struct RbTreeNode * pParent,
-    const void * pElement
+bool
+TreeSet_Impl_removeAllHandler(
+    void * pContext
+    , struct TreeSet_Node * pNode
 )
 {
-    struct RbTreeNode * const newNode = (struct RbTreeNode *)malloc(sizeof(struct RbTreeNode));
-    if(newNode != KAPHEIN_NULL) {
-        newNode->pElement_ = pElement;
-        newNode->pParent_ = pParent;
-        newNode->child_.pair_.pLeft_ = (struct RbTreeNode *)&nilNode;
-        newNode->child_.pair_.pRight_ = (struct RbTreeNode *)&nilNode;
-        newNode->red_ = 1;
+    const kaphein_UIntPtr listElement = (kaphein_UIntPtr)pNode;
+    
+    kaphein_coll_List_pushBack((struct kaphein_coll_List *)pContext, &listElement, KAPHEIN_ssizeof(listElement));
+
+    return false;
+}
+
+static
+struct TreeSet_Node *
+TreeSet_Impl_createNode(
+    const struct TreeSet_Impl * impl
+    , struct TreeSet_Node * pParent
+    , const void * srcElement
+    , enum kaphein_ErrorCode * errorCodeOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    struct TreeSet_Node * newNode = (struct TreeSet_Node *)kaphein_mem_allocate(
+        impl->allocator_
+        , KAPHEIN_ssizeof(*newNode)
+        , KAPHEIN_NULL
+        , &resultErrorCode
+    );
+    void * element = KAPHEIN_NULL;
+
+    if(KAPHEIN_NULL != newNode) {
+        element = kaphein_mem_allocate(
+            impl->allocator_
+            , impl->elementTrait_->elementSize
+            , KAPHEIN_NULL
+            , &resultErrorCode
+        );
+        
+        if(kapheinErrorCodeNoError == resultErrorCode) {
+            resultErrorCode = (*impl->elementTrait_->copyConstruct)(
+                element
+                , srcElement
+                , impl->allocator_
+            );
+
+            if(kapheinErrorCodeNoError != resultErrorCode) {
+                kaphein_mem_deallocate(impl->allocator_, element, impl->elementTrait_->elementSize);
+                kaphein_mem_deallocate(impl->allocator_, newNode, KAPHEIN_ssizeof(*newNode));
+                
+                newNode = KAPHEIN_NULL;
+            }
+            else {
+                newNode->element_ = element;
+                newNode->parent_ = pParent;
+                newNode->child_.pair_.left_ = (struct TreeSet_Node *)&nilNode;
+                newNode->child_.pair_.right_ = (struct TreeSet_Node *)&nilNode;
+                newNode->isRed_ = true;
+            }
+        }
+    }
+
+    if(KAPHEIN_NULL != errorCodeOut) {
+        *errorCodeOut = resultErrorCode;
     }
 
     return newNode;
 }
 
 static
-struct RbTreeNode *
-kaphein_coll_TreeSet_findNode(
-    const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-    , enum SearchTarget searchTarget
+enum kaphein_ErrorCode
+TreeSet_Impl_destroyNode(
+    struct TreeSet_Impl * impl
+    , struct TreeSet_Node * node
 )
 {
-    struct RbTreeNode * pPrevious = KAPHEIN_NULL;
-    struct RbTreeNode * pCurrent = thisObj->pRoot_;
-    int cmpResult;
-    int found = 0;
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+    
+    if(KAPHEIN_NULL != node->element_) {
+        resultErrorCode = (*impl->elementTrait_->destruct)(node->element_);
 
-    while(!found && !RbTreeNode_isNullOrNil(pCurrent)) {
-        cmpResult = (*thisObj->pComparator_)(pElement, pCurrent->pElement_);
+        if(kapheinErrorCodeNoError == resultErrorCode) {
+            resultErrorCode = kaphein_mem_deallocate(
+                impl->allocator_
+                , node->element_
+                , impl->elementTrait_->elementSize
+            );
+        }
+    }
+
+    if(kapheinErrorCodeNoError == resultErrorCode) {
+        resultErrorCode = kaphein_mem_deallocate(impl->allocator_, node, KAPHEIN_ssizeof(*node));
+    }
+
+    return resultErrorCode;
+}
+
+static
+struct TreeSet_Node *
+TreeSet_Impl_findNode(
+    const struct TreeSet_Impl * impl
+    , const void * element
+    , enum TreeSet_Impl_SearchTarget searchTarget
+)
+{
+    struct TreeSet_Node * pPrevious = KAPHEIN_NULL;
+    struct TreeSet_Node * pCurrent = impl->root_;
+    int cmpResult;
+    bool isNodeFound = false;
+
+    while(!isNodeFound && !TreeSet_Node_isNullOrNil(pCurrent)) {
+        cmpResult = (*impl->elementTrait_->compare)(element, pCurrent->element_);
         if(cmpResult < 0) {
             pPrevious = pCurrent;
-            pCurrent = pCurrent->child_.pair_.pLeft_;
+            pCurrent = pCurrent->child_.pair_.left_;
         }
         else if(cmpResult > 0) {
             pPrevious = pCurrent;
-            pCurrent = pCurrent->child_.pair_.pRight_;
+            pCurrent = pCurrent->child_.pair_.right_;
         }
         else {
-            found = 1;
+            isNodeFound = true;
         }
     }
 
     switch(searchTarget) {
     case stNotGreater:
-        if(!RbTreeNode_isNullOrNil(pCurrent)) {
+        if(!TreeSet_Node_isNullOrNil(pCurrent)) {
             break;
         }
 
     case stLess:
-        if(RbTreeNode_isNullOrNil(pCurrent)) {
+        if(TreeSet_Node_isNullOrNil(pCurrent)) {
             pCurrent = pPrevious;
         }
         
         while(
-            !RbTreeNode_isNullOrNil(pCurrent)
-            && (*thisObj->pComparator_)(pCurrent->pElement_, pElement) >= 0
+            !TreeSet_Node_isNullOrNil(pCurrent)
+            && (*impl->elementTrait_->compare)(pCurrent->element_, element) >= 0
         ) {
-            pCurrent = RbTreeNode_findLess(pCurrent);
+            pCurrent = TreeSet_Node_findLess(pCurrent);
         }
     break;
     case stNotLess:
-        if(!RbTreeNode_isNullOrNil(pCurrent)) {
+        if(!TreeSet_Node_isNullOrNil(pCurrent)) {
             break;
         }
 
     case stGreater:
-        if(RbTreeNode_isNullOrNil(pCurrent)) {
+        if(TreeSet_Node_isNullOrNil(pCurrent)) {
             pCurrent = pPrevious;
         }
         
         while(
-            !RbTreeNode_isNullOrNil(pCurrent)
-            && (*thisObj->pComparator_)(pElement, pCurrent->pElement_) >= 0
+            !TreeSet_Node_isNullOrNil(pCurrent)
+            && (*impl->elementTrait_->compare)(element, pCurrent->element_) >= 0
         ) {
-            pCurrent = RbTreeNode_findGreater(pCurrent);
+            pCurrent = TreeSet_Node_findGreater(pCurrent);
         }
     break;
     case stEqual:
     default:
         pCurrent = (
-            (pCurrent != KAPHEIN_NULL && !RbTreeNode_isNil(pCurrent))
+            (pCurrent != KAPHEIN_NULL && !TreeSet_Node_isNil(pCurrent))
             ? pCurrent
             : KAPHEIN_NULL
         );
@@ -449,64 +848,118 @@ kaphein_coll_TreeSet_findNode(
 }
 
 static
-void
-kaphein_coll_TreeSet_rebalanceAfterInsertion(
-    struct kaphein_coll_TreeSet * thisObj,
-    struct RbTreeNode * pTarget
+struct TreeSet_Node *
+TreeSet_Impl_insertNodeInBst(
+    struct TreeSet_Impl * impl
+    , const void * element
+    , enum kaphein_ErrorCode * errorCodeOut
 )
 {
-    struct RbTreeNode * pParent;
-    struct RbTreeNode * pUncle;
-    struct RbTreeNode * pGrandParent;
-    struct RbTreeNode * pCurrent = pTarget;
+    struct TreeSet_Node * newNode = KAPHEIN_NULL;
 
-    while(pCurrent != KAPHEIN_NULL) {
-        pParent = pCurrent->pParent_;
-        if(pParent == KAPHEIN_NULL) {
-            pCurrent->red_ = 0;
+    if(KAPHEIN_NULL == impl->root_) {
+        newNode = TreeSet_Impl_createNode(impl, KAPHEIN_NULL, element, errorCodeOut);
+        impl->root_ = newNode;
+    }
+    else {
+        struct TreeSet_Node * pCurrent;
+        
+        for(
+            pCurrent = impl->root_;
+            !TreeSet_Node_isNil(pCurrent);
+        ) {
+            const int cmpResult = (*impl->elementTrait_->compare)(element, pCurrent->element_);
+
+            if(cmpResult < 0) {
+                if(TreeSet_Node_isNil(pCurrent->child_.pair_.left_)) {
+                    newNode = TreeSet_Impl_createNode(impl, pCurrent, element, errorCodeOut);
+                    pCurrent->child_.pair_.left_ = newNode;
+                        
+                    pCurrent = (struct TreeSet_Node *)&nilNode;
+                }
+                else {
+                    pCurrent = pCurrent->child_.pair_.left_;
+                }
+            }
+            else if(cmpResult > 0) {
+                if(TreeSet_Node_isNil(pCurrent->child_.pair_.right_)) {
+                    newNode = TreeSet_Impl_createNode(impl, pCurrent, element, errorCodeOut);
+                    pCurrent->child_.pair_.right_ = newNode;
+                
+                    pCurrent = (struct TreeSet_Node *)&nilNode;
+                }
+                else {
+                    pCurrent = pCurrent->child_.pair_.right_;
+                }
+            }
+            else {
+                pCurrent = (struct TreeSet_Node *)&nilNode;
+            }
+        }
+    }
+
+    return newNode;
+}
+
+static
+void
+TreeSet_Impl_rebalanceAfterInsertion(
+    struct TreeSet_Impl * impl
+    , struct TreeSet_Node * pTarget
+)
+{
+    struct TreeSet_Node * pParent;
+    struct TreeSet_Node * pUncle;
+    struct TreeSet_Node * pGrandParent;
+    struct TreeSet_Node * pCurrent = pTarget;
+
+    while(KAPHEIN_NULL != pCurrent) {
+        pParent = pCurrent->parent_;
+        if(KAPHEIN_NULL == pParent) {
+            pCurrent->isRed_ = false;
 
             pCurrent = KAPHEIN_NULL;
         }
-        else if(pParent->red_) {
-            pGrandParent = pParent->pParent_;
-            pUncle = RbTreeNode_getTheOtherChild(pGrandParent, pParent);
-            if(pUncle != KAPHEIN_NULL && pUncle->red_) {
-                pUncle->red_ = 0;
-                pParent->red_ = 0;
+        else if(pParent->isRed_) {
+            pGrandParent = pParent->parent_;
+            pUncle = TreeSet_Node_getTheOtherChild(pGrandParent, pParent);
+            if(KAPHEIN_NULL != pUncle && pUncle->isRed_) {
+                pUncle->isRed_ = false;
+                pParent->isRed_ = false;
                 
                 pCurrent = pGrandParent;
-                if(pCurrent != KAPHEIN_NULL) {
-                    pCurrent->red_ = 1;
+                if(KAPHEIN_NULL != pCurrent) {
+                    pCurrent->isRed_ = true;
                 }
             }
             else {
                 if(
-                    pCurrent == pParent->child_.pair_.pRight_
-                    && pParent == pGrandParent->child_.pair_.pLeft_
+                    pCurrent == pParent->child_.pair_.right_
+                    && pParent == pGrandParent->child_.pair_.left_
                 ) {
-                    RbTreeNode_rotate(pParent, rdLeft);
-                    pCurrent = pCurrent->child_.pair_.pLeft_;
+                    TreeSet_Node_rotate(pParent, rdLeft);
+                    pCurrent = pCurrent->child_.pair_.left_;
                 }
                 else if(
-                    pCurrent == pParent->child_.pair_.pLeft_
-                    && pParent == pGrandParent->child_.pair_.pRight_
+                    pCurrent == pParent->child_.pair_.left_
+                    && pParent == pGrandParent->child_.pair_.right_
                 ) {
-                    RbTreeNode_rotate(pParent, rdRight);
-                    pCurrent = pCurrent->child_.pair_.pRight_;
+                    TreeSet_Node_rotate(pParent, rdRight);
+                    pCurrent = pCurrent->child_.pair_.right_;
                 }
                 
-                pParent = pCurrent->pParent_;
-                pParent->red_ = 0;
-                pGrandParent->red_ = 1;
-                RbTreeNode_rotate(
+                pParent = pCurrent->parent_;
+                pParent->isRed_ = false;
+                pGrandParent->isRed_ = true;
+                TreeSet_Node_rotate(
                     pGrandParent,
-                    (enum RotationDirection)(pCurrent == pParent->child_.pair_.pLeft_)
+                    (enum TreeSet_Node_RotationDirection)(pCurrent == pParent->child_.pair_.left_)
                 );
 
                 pCurrent = pGrandParent;
-                pParent = pGrandParent->pParent_;
-                if(pParent->pParent_ == KAPHEIN_NULL) {
-                    thisObj->pRoot_ = pParent;
+                pParent = pGrandParent->parent_;
+                if(KAPHEIN_NULL == pParent->parent_) {
+                    impl->root_ = pParent;
                 }
 
                 pCurrent = KAPHEIN_NULL;
@@ -520,53 +973,53 @@ kaphein_coll_TreeSet_rebalanceAfterInsertion(
 
 static
 void
-kaphein_coll_TreeSet_rebalanceAfterRemoval(
-    struct kaphein_coll_TreeSet * thisObj,
-    struct RbTreeNode * pReplacement
+TreeSet_Impl_rebalanceAfterRemoval(
+    struct TreeSet_Impl * impl
+    , struct TreeSet_Node * pReplacement
 )
 {
-    struct RbTreeNode * pSibling;
-    struct RbTreeNode * pParent;
-    struct RbTreeNode * pCurrent = pReplacement;
+    struct TreeSet_Node * pSibling;
+    struct TreeSet_Node * pParent;
+    struct TreeSet_Node * pCurrent = pReplacement;
     
-    while(pCurrent != KAPHEIN_NULL) {
-        pParent = pCurrent->pParent_;
-        if(pParent == KAPHEIN_NULL) {
-            thisObj->pRoot_ = pCurrent;
+    while(KAPHEIN_NULL != pCurrent) {
+        pParent = pCurrent->parent_;
+        if(KAPHEIN_NULL == pParent) {
+            impl->root_ = pCurrent;
 
             pCurrent = KAPHEIN_NULL;
         }
         else {
-            pSibling = RbTreeNode_getSibling(pCurrent);
-            if(pSibling->red_) {
-                pParent->red_ = 1;
-                pSibling->red_ = 0;
+            pSibling = TreeSet_Node_getSibling(pCurrent);
+            if(pSibling->isRed_) {
+                pParent->isRed_ = true;
+                pSibling->isRed_ = false;
 
-                RbTreeNode_rotate(
+                TreeSet_Node_rotate(
                     pParent,
-                    (enum RotationDirection)(pCurrent != pParent->child_.pair_.pLeft_)
+                    (enum TreeSet_Node_RotationDirection)(pCurrent != pParent->child_.pair_.left_)
                 );
-                if(pSibling->pParent_ == KAPHEIN_NULL) {
-                    thisObj->pRoot_ = pSibling;
+                if(KAPHEIN_NULL == pSibling->parent_) {
+                    impl->root_ = pSibling;
                 }
 
-                pSibling = RbTreeNode_getSibling(pCurrent);
+                pSibling = TreeSet_Node_getSibling(pCurrent);
             }
 
-            if(!pSibling->red_) {
-                const int caseNumber = (pSibling->child_.pair_.pRight_->red_ ? 0x02 : 0x00)
-                    | (pSibling->child_.pair_.pLeft_->red_ ? 0x01 : 0x00)
+            if(!pSibling->isRed_) {
+                const int caseNumber = (pSibling->child_.pair_.right_->isRed_ ? 0x02 : 0x00)
+                    | (pSibling->child_.pair_.left_->isRed_ ? 0x01 : 0x00)
                 ;
 
                 if(caseNumber == 0) {
-                    if(!pParent->red_) {
-                        pSibling->red_ = 1;
+                    if(!pParent->isRed_) {
+                        pSibling->isRed_ = true;
 
                         pCurrent = pParent;
                     }
                     else {
-                        pSibling->red_ = 1;
-                        pParent->red_ = 0;
+                        pSibling->isRed_ = true;
+                        pParent->isRed_ = false;
 
                         pCurrent = KAPHEIN_NULL;
                     }
@@ -576,37 +1029,37 @@ kaphein_coll_TreeSet_rebalanceAfterRemoval(
                     case 0:
                     break;
                     case 1:
-                        if(pCurrent == pParent->child_.pair_.pLeft_) {
-                            pSibling->red_ = 1;
-                            pSibling->child_.pair_.pLeft_->red_ = 0;
-                            RbTreeNode_rotate(pSibling, rdRight);
+                        if(pCurrent == pParent->child_.pair_.left_) {
+                            pSibling->isRed_ = true;
+                            pSibling->child_.pair_.left_->isRed_ = false;
+                            TreeSet_Node_rotate(pSibling, rdRight);
 
-                            pSibling = RbTreeNode_getSibling(pCurrent);
+                            pSibling = TreeSet_Node_getSibling(pCurrent);
                         }
                     break;
                     case 2:
-                        if(pCurrent == pParent->child_.pair_.pRight_) {
-                            pSibling->red_ = 1;
-                            pSibling->child_.pair_.pRight_->red_ = 0;
-                            RbTreeNode_rotate(pSibling, rdLeft);
+                        if(pCurrent == pParent->child_.pair_.right_) {
+                            pSibling->isRed_ = true;
+                            pSibling->child_.pair_.right_->isRed_ = false;
+                            TreeSet_Node_rotate(pSibling, rdLeft);
                             
-                            pSibling = RbTreeNode_getSibling(pCurrent);
+                            pSibling = TreeSet_Node_getSibling(pCurrent);
                         }
                     break;
                     case 3:
                     break;
                     }
 
-                    if(!pSibling->red_) {
-                        const int childNdx = (pCurrent != pParent->child_.pair_.pLeft_ ? 1 : 0);
+                    if(!pSibling->isRed_) {
+                        const int childNdx = (pCurrent != pParent->child_.pair_.left_ ? 1 : 0);
 
-                        pSibling->red_ = pParent->red_;
-                        pParent->red_ = 0;
+                        pSibling->isRed_ = pParent->isRed_;
+                        pParent->isRed_ = false;
                         
-                        pSibling->child_.ptrs_[~childNdx & 0x01]->red_ = 0;
-                        RbTreeNode_rotate(pParent, (enum RotationDirection)childNdx);
-                        if(pSibling->pParent_ == KAPHEIN_NULL) {
-                            thisObj->pRoot_ = pSibling;
+                        pSibling->child_.children_[~childNdx & 0x01]->isRed_ = false;
+                        TreeSet_Node_rotate(pParent, (enum TreeSet_Node_RotationDirection)childNdx);
+                        if(KAPHEIN_NULL == pSibling->parent_) {
+                            impl->root_ = pSibling;
                         }
                     }
 
@@ -622,229 +1075,420 @@ kaphein_coll_TreeSet_rebalanceAfterRemoval(
 
 enum kaphein_ErrorCode
 kaphein_coll_TreeSet_construct(
-    struct kaphein_coll_TreeSet * thisObj,
-    kaphein_coll_compareFunction * pComparator
+    struct kaphein_coll_TreeSet * thisObj
+    , const struct kaphein_coll_ElementTrait * elementTrait
+    , struct kaphein_mem_Allocator * allocator
 )
 {
-    if(thisObj == KAPHEIN_NULL || pComparator == KAPHEIN_NULL) {
-        return kapheinErrorCodeArgumentNull;
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == elementTrait
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)kaphein_mem_allocate(
+            allocator
+            , KAPHEIN_ssizeof(*impl)
+            , KAPHEIN_NULL
+            , &resultErrorCode
+        );
+
+        if(kapheinErrorCodeNoError == resultErrorCode) {
+            impl->allocator_ = allocator;
+            impl->elementTrait_ = elementTrait;
+            impl->root_ = KAPHEIN_NULL;
+            impl->elementCount_ = 0;
+            thisObj->impl_ = impl;
+        }
     }
 
-    thisObj->pComparator_ = pComparator;
-    thisObj->pRoot_ = KAPHEIN_NULL;
-    thisObj->count_ = 0;
-
-    return kapheinErrorCodeNoError;
+    return resultErrorCode;
 }
 
-void
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_destruct(
     struct kaphein_coll_TreeSet * thisObj
 )
 {
-    kaphein_coll_TreeSet_clear(thisObj);
-}
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
 
-kaphein_SSize
-kaphein_coll_TreeSet_getCount(
-    const struct kaphein_coll_TreeSet * thisObj
-)
-{
-    return thisObj->count_;
-}
-
-bool
-kaphein_coll_TreeSet_has(
-    const struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-)
-{
-    return kaphein_coll_TreeSet_findNode(thisObj, pElement, stEqual) != KAPHEIN_NULL;
-}
-
-struct RbTreeNode *
-kaphein_coll_TreeSet_add(
-    struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-)
-{
-    struct RbTreeNode * newNode = KAPHEIN_NULL;
-    struct RbTreeNode * pCurrent;
-    int cmpResult;
-
-    if(thisObj->pRoot_ == KAPHEIN_NULL) {
-        newNode = kaphein_coll_TreeSet_createNode(KAPHEIN_NULL, pElement);
-        thisObj->pRoot_ = newNode;
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
     }
-    else for(
-        pCurrent = thisObj->pRoot_;
-        !RbTreeNode_isNil(pCurrent);
-    ) {
-        cmpResult = (*thisObj->pComparator_)(pElement, pCurrent->pElement_);
-        if(cmpResult < 0) {
-            if(RbTreeNode_isNil(pCurrent->child_.pair_.pLeft_)) {
-                newNode = kaphein_coll_TreeSet_createNode(pCurrent, pElement);
-                pCurrent->child_.pair_.pLeft_ = newNode;
-                
-                pCurrent = (struct RbTreeNode *)&nilNode;
-            }
-            else {
-                pCurrent = pCurrent->child_.pair_.pLeft_;
-            }
-        }
-        else if(cmpResult > 0) {
-            if(RbTreeNode_isNil(pCurrent->child_.pair_.pRight_)) {
-                newNode = kaphein_coll_TreeSet_createNode(pCurrent, pElement);
-                pCurrent->child_.pair_.pRight_ = newNode;
-                
-                pCurrent = (struct RbTreeNode *)&nilNode;
-            }
-            else {
-                pCurrent = pCurrent->child_.pair_.pRight_;
-            }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisObj->impl_;
+        
+        if(KAPHEIN_NULL == impl) {
+            resultErrorCode = kapheinErrorCodeOperationInvalid;
         }
         else {
-            pCurrent = (struct RbTreeNode *)&nilNode;
-        }
-    }
-    
-    if(newNode != KAPHEIN_NULL) {
-        kaphein_coll_TreeSet_rebalanceAfterInsertion(thisObj, newNode);
-        ++thisObj->count_;
+            resultErrorCode = kaphein_coll_TreeSet_clear(thisObj);
 
-        thisObj->pRoot_ = RbTreeNode_getRoot(thisObj->pRoot_);
-    }
+            if(kapheinErrorCodeNoError == resultErrorCode) {
+                resultErrorCode = kaphein_mem_deallocate(
+                    impl->allocator_
+                    , impl
+                    , KAPHEIN_ssizeof(*impl)
+                );
 
-    return newNode;
-}
-
-bool
-kaphein_coll_TreeSet_remove(
-    struct kaphein_coll_TreeSet * thisObj
-    , const void * pElement
-)
-{
-    struct RbTreeNode ** pChildSlot;
-    struct RbTreeNode * pMaxOfLeftSubTree;
-    struct RbTreeNode * pChildOfRemoved = KAPHEIN_NULL;
-    struct RbTreeNode * removedNode = kaphein_coll_TreeSet_findNode(thisObj, pElement, stEqual);
-    int isRemovedNodeRed;
-    bool loop = true;
-
-    if(removedNode != KAPHEIN_NULL) {
-        while(loop) {
-            const int caseNumber = (RbTreeNode_isNullOrNil(removedNode->child_.pair_.pRight_) ? 0x01 : 0x00)
-                | (RbTreeNode_isNullOrNil(removedNode->child_.pair_.pLeft_) ? 0x02 : 0x00)
-            ;
-            switch(caseNumber) {
-            case 0: //Has two non-nil children.
-                pMaxOfLeftSubTree = RbTreeNode_findRightMost(removedNode->child_.pair_.pLeft_);
-                removedNode->pElement_ = pMaxOfLeftSubTree->pElement_;
-                removedNode = pMaxOfLeftSubTree;
-            break;
-            case 1: //Has left non-nil child.
-            case 2: //Has right non-nil child.
-                pChildOfRemoved = removedNode->child_.ptrs_[caseNumber - 1];
-                pChildOfRemoved->pParent_ = removedNode->pParent_;
-
-                pChildSlot = RbTreeNode_getChildSlot(removedNode);
-                if(pChildSlot != KAPHEIN_NULL) {
-                    *pChildSlot = pChildOfRemoved;
+                if(kapheinErrorCodeNoError == resultErrorCode) {
+                    thisObj->impl_ = KAPHEIN_NULL;
                 }
-                
-                if(!removedNode->red_) {
-                    if(pChildOfRemoved->red_) {
-                        pChildOfRemoved->red_ = 0;
-
-                        thisObj->pRoot_ = RbTreeNode_getRoot(pChildOfRemoved);
-                    }
-                    else {
-                        kaphein_coll_TreeSet_rebalanceAfterRemoval(thisObj, pChildOfRemoved);
-                    }
-                }
-                else {
-                    thisObj->pRoot_ = RbTreeNode_getRoot(pChildOfRemoved);
-                }
-
-                loop = false;
-            break;
-            case 3: //Has no non-nil children.
-                isRemovedNodeRed = removedNode->red_;
-                if(!isRemovedNodeRed) {
-                    kaphein_coll_TreeSet_rebalanceAfterRemoval(thisObj, removedNode);
-                }
-                
-                pChildSlot = RbTreeNode_getChildSlot(removedNode);
-                if(pChildSlot != KAPHEIN_NULL) {
-                    *pChildSlot = (struct RbTreeNode *)&nilNode;
-                    thisObj->pRoot_ = RbTreeNode_getRoot(removedNode->pParent_);
-                }
-                else {
-                    thisObj->pRoot_ = KAPHEIN_NULL;
-                }
-
-                loop = false;
-            break;
             }
         }
-
-        free(removedNode);
-
-        --thisObj->count_;
     }
-    
-    return removedNode != KAPHEIN_NULL;
+
+    return resultErrorCode;
 }
 
-static
-bool
-kaphein_coll_TreeSet_removeAllHandler(
-    void* pContext,
-    struct RbTreeNode * pNode
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_getCount(
+    const struct kaphein_coll_TreeSet * thisObj
+    , kaphein_SSize * countOut
 )
 {
-    kaphein_UIntPtr listElement;
-    
-    listElement = (kaphein_UIntPtr)pNode;
-    kaphein_coll_List_pushBack((struct kaphein_coll_List *)pContext, &listElement, KAPHEIN_ssizeof(listElement));
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
 
-    return false;
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == countOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct TreeSet_Impl *const impl = (const struct TreeSet_Impl *)thisObj->impl_;
+
+        *countOut = impl->elementCount_;
+    }
+
+    return resultErrorCode;
 }
 
-void
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_isEmpty(
+    const struct kaphein_coll_TreeSet * thisObj
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == truthOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct TreeSet_Impl *const impl = (const struct TreeSet_Impl *)thisObj->impl_;
+
+        *truthOut = impl->elementCount_ < 1;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_getBeginConstIterator(
+    const struct kaphein_coll_TreeSet * thisObj
+    , struct kaphein_coll_TreeSet_Iterator * iterOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == iterOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct TreeSet_Impl *const impl = (const struct TreeSet_Impl *)thisObj->impl_;
+
+        iterOut->parent.thisObj = iterOut;
+        iterOut->parent.vTable = &iteratorParentVTable;
+        iterOut->treeSet_ = thisObj;
+        iterOut->currentNode_ = (const void *)TreeSet_Node_findLeftMost((struct TreeSet_Node *)impl->root_);
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_has(
+    const struct kaphein_coll_TreeSet * thisObj
+    , const void * element
+    , bool * truthOut
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == truthOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisObj->impl_;
+
+        if(KAPHEIN_NULL == impl) {
+            resultErrorCode = kapheinErrorCodeOperationInvalid;
+        }
+        else {
+            *truthOut = KAPHEIN_NULL != TreeSet_Impl_findNode(impl, element, stEqual);
+        }
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_add(
+    struct kaphein_coll_TreeSet * thisObj
+    , const void * element
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == element
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisObj->impl_;
+        struct TreeSet_Node *const newNode = TreeSet_Impl_insertNodeInBst(impl, element, &resultErrorCode);
+        
+        if(
+            kapheinErrorCodeNoError == resultErrorCode
+            && KAPHEIN_NULL != newNode
+        ) {
+            TreeSet_Impl_rebalanceAfterInsertion(impl, newNode);
+            ++impl->elementCount_;
+
+            //TODO : Figure out why i wrote this line...
+            //impl->root_ = TreeSet_Node_getRoot(impl->root_);
+        }
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_remove(
+    struct kaphein_coll_TreeSet * thisObj
+    , const void * element
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == element
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisObj->impl_;
+        struct TreeSet_Node * removedNode = TreeSet_Impl_findNode(impl, element, stEqual);
+
+        if(KAPHEIN_NULL == removedNode) {
+            resultErrorCode = kapheinErrorCodeNoSuchElement;
+        }
+        else {
+            struct TreeSet_Node ** pChildSlot;
+            struct TreeSet_Node * pMaxOfLeftSubTree;
+            struct TreeSet_Node * pChildOfRemoved = KAPHEIN_NULL;
+            bool isRemovedNodeRed;
+            bool isLooping = true;
+
+            while(isLooping) {
+                const int caseNumber = (TreeSet_Node_isNullOrNil(removedNode->child_.pair_.right_) ? 0x01 : 0x00)
+                    | (TreeSet_Node_isNullOrNil(removedNode->child_.pair_.left_) ? 0x02 : 0x00)
+                ;
+                switch(caseNumber) {
+                //Has two non-nil children.
+                case 0:
+                    pMaxOfLeftSubTree = TreeSet_Node_findRightMost(removedNode->child_.pair_.left_);
+                    
+                    resultErrorCode = (*impl->elementTrait_->destruct)(removedNode->element_);
+                    resultErrorCode = (*impl->elementTrait_->copyConstruct)(
+                        removedNode->element_
+                        , pMaxOfLeftSubTree->element_
+                        , impl->allocator_
+                    );
+
+                    if(kapheinErrorCodeNoError == resultErrorCode) {
+                        removedNode = pMaxOfLeftSubTree;
+                    }
+                    else {
+                        isLooping = false;
+                    }
+                break;
+                //Has a non-nil left child.
+                case 1:
+                //Has a non-nil right child.
+                case 2:
+                    pChildOfRemoved = removedNode->child_.children_[caseNumber - 1];
+                    pChildOfRemoved->parent_ = removedNode->parent_;
+
+                    pChildSlot = TreeSet_Node_getChildSlot(removedNode);
+                    if(pChildSlot != KAPHEIN_NULL) {
+                        *pChildSlot = pChildOfRemoved;
+                    }
+                
+                    if(!removedNode->isRed_) {
+                        if(pChildOfRemoved->isRed_) {
+                            pChildOfRemoved->isRed_ = false;
+
+                            impl->root_ = TreeSet_Node_getRoot(pChildOfRemoved);
+                        }
+                        else {
+                            TreeSet_Impl_rebalanceAfterRemoval(impl, pChildOfRemoved);
+                        }
+                    }
+                    else {
+                        impl->root_ = TreeSet_Node_getRoot(pChildOfRemoved);
+                    }
+
+                    isLooping = false;
+                break;
+                //Has no non-nil children.
+                case 3:
+                    isRemovedNodeRed = removedNode->isRed_;
+                    if(!isRemovedNodeRed) {
+                        TreeSet_Impl_rebalanceAfterRemoval(impl, removedNode);
+                    }
+                    
+                    pChildSlot = TreeSet_Node_getChildSlot(removedNode);
+                    if(pChildSlot != KAPHEIN_NULL) {
+                        *pChildSlot = (struct TreeSet_Node *)&nilNode;
+                        impl->root_ = TreeSet_Node_getRoot(removedNode->parent_);
+                    }
+                    else {
+                        impl->root_ = KAPHEIN_NULL;
+                    }
+
+                    isLooping = false;
+                break;
+                }
+            }
+
+            if(kapheinErrorCodeNoError == resultErrorCode) {
+                --impl->elementCount_;
+
+                resultErrorCode = TreeSet_Impl_destroyNode(impl, removedNode);
+            }
+        }
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
 kaphein_coll_TreeSet_clear(
     struct kaphein_coll_TreeSet * thisObj
 )
 {
-    if(thisObj->pRoot_ != KAPHEIN_NULL) {
-        kaphein_UIntPtr listElement;
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(KAPHEIN_NULL == thisObj) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        struct TreeSet_Impl *const impl = (struct TreeSet_Impl *)thisObj->impl_;
         struct kaphein_coll_List nodeStack;
+        kaphein_UIntPtr listElement;
         kaphein_SSize listElementSize;
         bool truth;
 
-        kaphein_coll_List_construct(&nodeStack, KAPHEIN_NULL, KAPHEIN_NULL);
+        if(KAPHEIN_NULL != impl->root_) {
+            kaphein_coll_List_construct(&nodeStack, KAPHEIN_NULL, KAPHEIN_NULL);
 
-        RbTreeNode_traverseByPostorder(
-            thisObj->pRoot_,
-            kaphein_coll_TreeSet_removeAllHandler,
-            (void*)&nodeStack
-        );
+            TreeSet_Node_traverseByPostorder(
+                impl->root_
+                , TreeSet_Impl_removeAllHandler
+                , (void *)&nodeStack
+            );
 
-        while(!(kaphein_coll_List_isEmpty(&nodeStack, &truth), truth)) {
-            listElementSize = KAPHEIN_ssizeof(listElement);
-            kaphein_coll_List_popBack(&nodeStack, &listElement, &listElementSize);
-            free((void *)listElement);
+            while(
+                kapheinErrorCodeNoError == resultErrorCode
+                && !(kaphein_coll_List_isEmpty(&nodeStack, &truth), truth)
+            ) {
+                listElementSize = KAPHEIN_ssizeof(listElement);
+                kaphein_coll_List_popBack(&nodeStack, &listElement, &listElementSize);
+
+                resultErrorCode = TreeSet_Impl_destroyNode(impl, (struct TreeSet_Node *)((void *)listElement));
+            }
+
+            kaphein_coll_List_destruct(&nodeStack);
+
+            if(resultErrorCode == kapheinErrorCodeNoError) {
+                impl->root_ = KAPHEIN_NULL;
+                impl->elementCount_ = 0;
+            }
         }
 
-        kaphein_coll_List_destruct(&nodeStack);
-
-        thisObj->pRoot_ = KAPHEIN_NULL;
-        thisObj->count_ = 0;
+        #ifdef _DEBUG
+        if(KAPHEIN_NULL == impl->root_ && impl->elementCount_ > 0) {
+            system("pause");
+        }
+        #endif
     }
 
-    #ifdef _DEBUG
-    if(thisObj->pRoot_ == KAPHEIN_NULL && thisObj->count_ > 0) {
-        system("pause");
-    }
-    #endif
+    return resultErrorCode;
 }
+
+enum kaphein_ErrorCode
+kaphein_coll_TreeSet_toArray(
+    const struct kaphein_coll_TreeSet * thisObj
+    , void * elementsOut
+    , kaphein_SSize elementsOutSize
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(
+        KAPHEIN_NULL == thisObj
+        || KAPHEIN_NULL == elementsOut
+    ) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        const struct TreeSet_Impl *const impl = (const struct TreeSet_Impl *)thisObj->impl_;
+
+        if(KAPHEIN_NULL == impl) {
+            resultErrorCode = kapheinErrorCodeOperationInvalid;
+        }
+        else if(elementsOutSize < impl->elementTrait_->elementSize * impl->elementCount_) {
+            resultErrorCode = kapheinErrorCodeNotEnoughBufferSpace;
+        }
+        else {
+            struct TreeSet_Node * pCurrent;
+            char * dest = (char *)elementsOut;
+            kaphein_SSize i;
+            
+            for(
+                pCurrent = TreeSet_Node_findLeftMost(impl->root_), i = impl->elementCount_;
+                kapheinErrorCodeNoError == resultErrorCode && KAPHEIN_NULL != pCurrent && i > 0;
+                dest += impl->elementTrait_->elementSize, pCurrent = TreeSet_Node_findGreater(pCurrent)
+            ) {
+                --i;
+
+                resultErrorCode = (*impl->elementTrait_->copyConstruct)(
+                    dest
+                    , pCurrent->element_
+                    , impl->allocator_
+                );
+            }
+        }
+    }
+
+    return resultErrorCode;
+}
+
+/* **************************************************************** */

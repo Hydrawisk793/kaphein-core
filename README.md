@@ -9,7 +9,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Write kaphein_mem_SegmentPool class.
 - Organize source codes for testing.
 - Add documentation comments.
-- Refactor kaphein_coll_TreeSet class.
 - Test kaphein_text module.
 - Implement regular expression module.
 

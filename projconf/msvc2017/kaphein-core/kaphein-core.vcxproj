@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\kaphein\coll\def.h" />
+    <ClInclude Include="..\..\..\include\kaphein\coll\Iterator.h" />
     <ClInclude Include="..\..\..\include\kaphein\coll\List.h" />
     <ClInclude Include="..\..\..\include\kaphein\coll\RingBuffer.h" />
     <ClInclude Include="..\..\..\include\kaphein\coll\sort.h" />

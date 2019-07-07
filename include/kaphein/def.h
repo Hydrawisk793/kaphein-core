@@ -783,7 +783,11 @@ enum kaphein_ErrorCode
 
     , kapheinErrorCodeCollectionUnderflow = -11
 
-    , kapheinErrorCodeIterationStopped = -12
+    , kapheinErrorCodeNoSuchElement = -12
+
+    , kapheinErrorCodeElementAlreadyExists = -13
+
+    , kapheinErrorCodeIterationStopped = -14
 
     , kapheinErrorCodeArgumentInvalid = -20
 
@@ -847,6 +851,12 @@ kaphein_copyConstructFunction(
     , struct kaphein_mem_Allocator * allocator
 );
 
+/**
+ *  @brief A definition for a function for destructing an object.
+ *  @details This function should act like destructors in object-oriented programming languages.
+ *  <br/>Destructing an object must succeeded except the pointer to an object is null.
+ *  @param thisObj A pointer to an object to be destructed.
+ */
 typedef
 enum kaphein_ErrorCode
 kaphein_destructFunction(

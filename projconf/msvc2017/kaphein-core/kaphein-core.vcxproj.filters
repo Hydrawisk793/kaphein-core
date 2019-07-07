@@ -149,9 +149,6 @@
     <ClInclude Include="..\..\..\include\kaphein\math\def.h">
       <Filter>include\kaphein\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\kaphein\coll\TreeSet.h">
-      <Filter>include\kaphein\coll</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\kaphein\math\Vector3.h">
       <Filter>include\kaphein\math</Filter>
     </ClInclude>
@@ -181,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\kaphein\math\IntervalInt32.h">
       <Filter>include\kaphein\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\kaphein\coll\Iterator.h">
+      <Filter>include\kaphein\coll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\kaphein\coll\TreeSet.h">
+      <Filter>include\kaphein\coll</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -235,9 +238,6 @@
     <ClCompile Include="..\..\..\src\kaphein\math\matrix.c">
       <Filter>src\kaphein\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\kaphein\coll\TreeSet.c">
-      <Filter>src\kaphein\coll</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\kaphein\math\Vector3.c">
       <Filter>src\kaphein\math</Filter>
     </ClCompile>
@@ -258,6 +258,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\kaphein\math\IntervalInt32.c">
       <Filter>src\kaphein\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\coll\TreeSet.c">
+      <Filter>src\kaphein\coll</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

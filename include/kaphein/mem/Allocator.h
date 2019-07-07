@@ -6,10 +6,7 @@
 
 struct kaphein_mem_Allocator_VTable
 {
-    enum kaphein_ErrorCode
-    (* destruct) (
-        void * thisObj
-    );
+    kaphein_destructFunction * destruct;
 
     void *
     (* allocate) (
