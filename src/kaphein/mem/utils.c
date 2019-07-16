@@ -76,14 +76,14 @@ kaphein_mem_allocate(
     , enum kaphein_ErrorCode * errorCodeOut
 )
 {
-    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
     void * memory = KAPHEIN_NULL;
+    enum kaphein_ErrorCode errorCode = kapheinErrorCodeNoError;
 
-    if(allocator == KAPHEIN_NULL) {
+    if(KAPHEIN_NULL == allocator) {
         memory = kaphein_mem_defaultAllocate(
             memorySize
             , hint
-            , errorCodeOut
+            , &errorCode
         );
     }
     else {
@@ -95,9 +95,13 @@ kaphein_mem_allocate(
                 allocator->thisObj
                 , memorySize
                 , hint
-                , errorCodeOut
+                , &errorCode
             );
         }
+    }
+
+    if(KAPHEIN_NULL != errorCodeOut) {
+        *errorCodeOut = errorCode;
     }
 
     return memory;

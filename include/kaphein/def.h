@@ -10,7 +10,11 @@
 #define KAPHEIN_x_static_assert(condition, message) {enum { static_assert_value = 1 / (!!(condition)) };}
 #define KAPHEIN_x_horrible_cast(targetPtrType, ptr) ((targetPtrType)((void *)(ptr)))
 #define KAPHEIN_x_const_horrible_cast(targetConstPtrType, ptr) ((targetConstPtrType)((const void *)(ptr)))
-#define KAPHEIN_x_UNUSED_PARAMETER(p) p;
+#if defined(_MSC_VER)
+    #define KAPHEIN_x_UNUSED_PARAMETER(p) p;
+#else
+    #define KAPHEIN_x_UNUSED_PARAMETER(p)
+#endif
 
 #define KAPHEIN_x_FIND_MINIMUM_SIGNED_INT(bitCount, a, b) (a - ((a - b) & ((a - b) >> (bitCount - 1))))
 #define KAPHEIN_x_FIND_MAXIMUM_SIGNED_INT(bitCount, a, b) (b + ((a - b) & ((a - b) >> (bitCount - 1))))
@@ -664,7 +668,7 @@ typedef KAPHEIN_COMPOPT_UINT64_TYPE kaphein_UInt64;
     #endif
 #elif defined(__GNUC__)
     #define KAPHEIN_ATTRIBUTE_INLINE inline
-    #define KAPHEIN_ATTRIBUTE_FORCE_INLINE __attribute__ ((alwaysinline))
+    #define KAPHEIN_ATTRIBUTE_FORCE_INLINE inline __attribute__((always_inline))
 #else
     #define KAPHEIN_ATTRIBUTE_INLINE
     #define KAPHEIN_ATTRIBUTE_FORCE_INLINE

@@ -57,8 +57,11 @@ static
 const struct TreeSet_Node nilNode = {
     KAPHEIN_NULL
     , KAPHEIN_NULL
+#ifdef _MSC_VER
     , KAPHEIN_NULL
-    , KAPHEIN_NULL
+#else
+    , {{KAPHEIN_NULL , KAPHEIN_NULL}}
+#endif
     , false
 };
 
