@@ -31,7 +31,10 @@
     <ClInclude Include="..\..\..\include\kaphein\def.h" />
     <ClInclude Include="..\..\..\include\kaphein\ErrorCode.h" />
     <ClInclude Include="..\..\..\include\kaphein\geom3d\def.h" />
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Quaternion.h" />
     <ClInclude Include="..\..\..\include\kaphein\geom3d\Transform.h" />
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Vector3.h" />
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Vector4.h" />
     <ClInclude Include="..\..\..\include\kaphein\io\FileAccess.h" />
     <ClInclude Include="..\..\..\include\kaphein\io\FileMode.h" />
     <ClInclude Include="..\..\..\include\kaphein\io\FileStream.h" />
@@ -44,7 +47,6 @@
     <ClInclude Include="..\..\..\include\kaphein\math\Quaternion.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\scalar.h" />
     <ClInclude Include="..\..\..\include\kaphein\math\vector.h" />
-    <ClInclude Include="..\..\..\include\kaphein\math\Vector3.h" />
     <ClInclude Include="..\..\..\include\kaphein\mem\Allocator.h" />
     <ClInclude Include="..\..\..\include\kaphein\mem\defAlloc.h" />
     <ClInclude Include="..\..\..\include\kaphein\mem\SegmentPool.h" />
@@ -67,13 +69,16 @@
     <ClCompile Include="..\..\..\src\kaphein\coll\TreeSet.c" />
     <ClCompile Include="..\..\..\src\kaphein\coll\Vector.c" />
     <ClCompile Include="..\..\..\src\kaphein\ErrorCode.c" />
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Aabb.c" />
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Quaternion.c" />
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Vector3.c" />
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Vector4.c" />
     <ClCompile Include="..\..\..\src\kaphein\io\FileStream_windows.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\Interval.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\IntervalInt32.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\matrix.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\quaternion_c.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\scalar.c" />
-    <ClCompile Include="..\..\..\src\kaphein\math\Vector3.c" />
     <ClCompile Include="..\..\..\src\kaphein\math\vector_c.c" />
     <ClCompile Include="..\..\..\src\kaphein\mem\defAlloc.c" />
     <ClCompile Include="..\..\..\src\kaphein\mem\SegmentPool.c" />

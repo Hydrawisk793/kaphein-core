@@ -149,9 +149,6 @@
     <ClInclude Include="..\..\..\include\kaphein\math\def.h">
       <Filter>include\kaphein\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\kaphein\math\Vector3.h">
-      <Filter>include\kaphein\math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\kaphein\text\base64.h">
       <Filter>include\kaphein\text</Filter>
     </ClInclude>
@@ -184,6 +181,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\kaphein\coll\TreeSet.h">
       <Filter>include\kaphein\coll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Quaternion.h">
+      <Filter>include\kaphein\geom3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Vector4.h">
+      <Filter>include\kaphein\geom3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\kaphein\geom3d\Vector3.h">
+      <Filter>include\kaphein\geom3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,9 +244,6 @@
     <ClCompile Include="..\..\..\src\kaphein\math\matrix.c">
       <Filter>src\kaphein\math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\kaphein\math\Vector3.c">
-      <Filter>src\kaphein\math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\kaphein\text\base64.c">
       <Filter>src\kaphein\text</Filter>
     </ClCompile>
@@ -261,6 +264,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\kaphein\coll\TreeSet.c">
       <Filter>src\kaphein\coll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Aabb.c">
+      <Filter>src\kaphein\geom3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Quaternion.c">
+      <Filter>src\kaphein\geom3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Vector3.c">
+      <Filter>src\kaphein\geom3d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\kaphein\geom3d\Vector4.c">
+      <Filter>src\kaphein\geom3d</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

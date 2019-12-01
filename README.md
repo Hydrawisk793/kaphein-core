@@ -11,4 +11,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Add documentation comments.
 - Test kaphein_text module.
 - Implement regular expression module.
-

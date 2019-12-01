@@ -1,9 +1,22 @@
 #include "kaphein/math/scalar.h"
-#include "kaphein/math/Vector3.h"
+#include "kaphein/geom3d/Vector3.h"
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_setZero(
-    struct kaphein_math_Vector3 * thisObj
+kaphein_geom3d_Vector3_copyTo(
+    const struct kaphein_geom3d_Vector3 * src
+    , struct kaphein_geom3d_Vector3 * dest
+)
+{
+    dest->u.a[0] = src->u.a[0];
+    dest->u.a[1] = src->u.a[1];
+    dest->u.a[2] = src->u.a[2];
+
+    return kapheinErrorCodeNoError;
+}
+
+enum kaphein_ErrorCode
+kaphein_geom3d_Vector3_setZero(
+    struct kaphein_geom3d_Vector3 * thisObj
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -21,8 +34,8 @@ kaphein_math_Vector3_setZero(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_fill(
-    struct kaphein_math_Vector3 * thisObj
+kaphein_geom3d_Vector3_fill(
+    struct kaphein_geom3d_Vector3 * thisObj
     , float value
 )
 {
@@ -41,9 +54,31 @@ kaphein_math_Vector3_fill(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_negate(
-    const struct kaphein_math_Vector3 * thisObj
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_setXyz(
+    struct kaphein_geom3d_Vector3 * thisObj
+    , float x
+    , float y
+    , float z
+)
+{
+    enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
+
+    if(thisObj == KAPHEIN_NULL) {
+        resultErrorCode = kapheinErrorCodeArgumentNull;
+    }
+    else {
+        thisObj->u.a[0] = x;
+        thisObj->u.a[1] = y;
+        thisObj->u.a[2] = z;
+    }
+
+    return resultErrorCode;
+}
+
+enum kaphein_ErrorCode
+kaphein_geom3d_Vector3_negate(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -61,10 +96,10 @@ kaphein_math_Vector3_negate(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_add(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * other
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_add(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * other
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -82,10 +117,10 @@ kaphein_math_Vector3_add(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_subtract(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * other
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_subtract(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * other
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -103,10 +138,10 @@ kaphein_math_Vector3_subtract(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_scale(
-    const struct kaphein_math_Vector3 * thisObj
+kaphein_geom3d_Vector3_scale(
+    const struct kaphein_geom3d_Vector3 * thisObj
     , float scalar
-    , struct kaphein_math_Vector3 * resultOut
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -124,10 +159,10 @@ kaphein_math_Vector3_scale(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_cross(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * other
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_cross(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * other
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;
@@ -145,9 +180,9 @@ kaphein_math_Vector3_cross(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_dot(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * other
+kaphein_geom3d_Vector3_dot(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * other
     , float * resultOut
 )
 {
@@ -171,24 +206,24 @@ kaphein_math_Vector3_dot(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_norm2Sq(
-    const struct kaphein_math_Vector3 * thisObj
+kaphein_geom3d_Vector3_norm2Sq(
+    const struct kaphein_geom3d_Vector3 * thisObj
     , float * resultOut
 )
 {
-    return kaphein_math_Vector3_dot(thisObj, thisObj, resultOut);
+    return kaphein_geom3d_Vector3_dot(thisObj, thisObj, resultOut);
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_norm2(
-    const struct kaphein_math_Vector3 * thisObj
+kaphein_geom3d_Vector3_norm2(
+    const struct kaphein_geom3d_Vector3 * thisObj
     , float * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode;
     float norm2Sq = 0.0f;
 
-    resultErrorCode = kaphein_math_Vector3_norm2Sq(thisObj, &norm2Sq);
+    resultErrorCode = kaphein_geom3d_Vector3_norm2Sq(thisObj, &norm2Sq);
     if(resultErrorCode == kapheinErrorCodeNoError) {
         *resultOut = kaphein_math_sqrtF32(norm2Sq);
     }
@@ -197,21 +232,21 @@ kaphein_math_Vector3_norm2(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_normalize(
-    const struct kaphein_math_Vector3 * thisObj
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_normalize(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode;
     float norm2Sq = 0.0f;
     
-    resultErrorCode = kaphein_math_Vector3_norm2Sq(thisObj, &norm2Sq);
+    resultErrorCode = kaphein_geom3d_Vector3_norm2Sq(thisObj, &norm2Sq);
     if(resultErrorCode == kapheinErrorCodeNoError) {
         if(kaphein_math_almostEqualF32(norm2Sq, 0.0f)) {
-            resultErrorCode = kaphein_math_Vector3_setZero(resultOut);
+            resultErrorCode = kaphein_geom3d_Vector3_setZero(resultOut);
         }
         else {
-            resultErrorCode = kaphein_math_Vector3_scale(thisObj, 1.0f / kaphein_math_sqrtF32(norm2Sq), resultOut);
+            resultErrorCode = kaphein_geom3d_Vector3_scale(thisObj, 1.0f / kaphein_math_sqrtF32(norm2Sq), resultOut);
         }
     }
 
@@ -219,24 +254,24 @@ kaphein_math_Vector3_normalize(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_project(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * axis
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_project(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * axis
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode;
     float axisNorm2Sq;
     float vInDotAxis;
     
-    resultErrorCode = kaphein_math_Vector3_norm2Sq(axis, &axisNorm2Sq);
+    resultErrorCode = kaphein_geom3d_Vector3_norm2Sq(axis, &axisNorm2Sq);
     if(resultErrorCode == kapheinErrorCodeNoError) {
         if(kaphein_math_almostEqualF32(axisNorm2Sq, 0.0f)) {
-            kaphein_math_Vector3_setZero(resultOut);
+            kaphein_geom3d_Vector3_setZero(resultOut);
         }
         else {
-            kaphein_math_Vector3_dot(thisObj, axis, &vInDotAxis);
-            kaphein_math_Vector3_scale(axis, vInDotAxis / axisNorm2Sq, resultOut);
+            kaphein_geom3d_Vector3_dot(thisObj, axis, &vInDotAxis);
+            kaphein_geom3d_Vector3_scale(axis, vInDotAxis / axisNorm2Sq, resultOut);
         }
     }
 
@@ -244,47 +279,47 @@ kaphein_math_Vector3_project(
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_projectOnPlane(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * normal
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_projectOnPlane(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * normal
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode;
 
-    resultErrorCode = kaphein_math_Vector3_project(thisObj, normal, resultOut);
+    resultErrorCode = kaphein_geom3d_Vector3_project(thisObj, normal, resultOut);
     if(resultErrorCode == kapheinErrorCodeNoError) {
-        kaphein_math_Vector3_subtract(thisObj, resultOut, resultOut);
+        kaphein_geom3d_Vector3_subtract(thisObj, resultOut, resultOut);
     }
 
     return resultErrorCode;
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_reflect(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * normal
-    , struct kaphein_math_Vector3 * resultOut
+kaphein_geom3d_Vector3_reflect(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * normal
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode;
     float inDotNormal;
 
-    resultErrorCode = kaphein_math_Vector3_dot(thisObj, normal, &inDotNormal);
+    resultErrorCode = kaphein_geom3d_Vector3_dot(thisObj, normal, &inDotNormal);
     if(resultErrorCode == kapheinErrorCodeNoError) {
-        kaphein_math_Vector3_scale(normal, 2.0f * inDotNormal, resultOut);
-        kaphein_math_Vector3_subtract(thisObj, resultOut, resultOut);
+        kaphein_geom3d_Vector3_scale(normal, 2.0f * inDotNormal, resultOut);
+        kaphein_geom3d_Vector3_subtract(thisObj, resultOut, resultOut);
     }
 
     return resultErrorCode;
 }
 
 enum kaphein_ErrorCode
-kaphein_math_Vector3_lerp(
-    const struct kaphein_math_Vector3 * thisObj
-    , const struct kaphein_math_Vector3 * other
+kaphein_geom3d_Vector3_lerp(
+    const struct kaphein_geom3d_Vector3 * thisObj
+    , const struct kaphein_geom3d_Vector3 * other
     , float ratio
-    , struct kaphein_math_Vector3 * resultOut
+    , struct kaphein_geom3d_Vector3 * resultOut
 )
 {
     enum kaphein_ErrorCode resultErrorCode = kapheinErrorCodeNoError;

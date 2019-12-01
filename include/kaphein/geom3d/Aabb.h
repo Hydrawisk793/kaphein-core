@@ -1,41 +1,47 @@
-#ifndef KAPHEIN_GEOM3D_Aabb_H
-#define KAPHEIN_GEOM3D_Aabb_H
+#ifndef KAPHEIN_HGRD_kaphein_geom3d_Aabb_H
+#define KAPHEIN_HGRD_kaphein_geom3d_Aabb_H
 
+#include "../ErrorCode.h"
 #include "Vector3.h"
 
-struct kapheinGeom3dAabb
+struct kaphein_geom3d_Aabb
 {
-    struct kapheinGeom3dVector3 center;
+    struct kaphein_geom3d_Vector3 center;
 
-    struct kapheinGeom3dVector3 extent;
+    struct kaphein_geom3d_Vector3 extent;
 };
 
-int kapheinGeom3dAabbFromBounds(
-    struct kapheinGeom3dAabb *aabbOut
-    , const struct kapheinGeom3dVector3 *min
-    , const struct kapheinGeom3dVector3 *max
+enum kaphein_ErrorCode
+kaphein_geom3d_Aabb_fromBounds(
+    struct kaphein_geom3d_Aabb *aabbOut
+    , const struct kaphein_geom3d_Vector3 *min
+    , const struct kaphein_geom3d_Vector3 *max
 );
 
-int kapheinGeom3dAabbGetPoints(
-    const struct kapheinGeom3dAabb *aabb
-    , struct kapheinGeom3dVector3 *pointsOut
+enum kaphein_ErrorCode
+kaphein_geom3d_Aabb_getPoints(
+    const struct kaphein_geom3d_Aabb *aabb
+    , struct kaphein_geom3d_Vector3 *pointsOut
     , int *pointCountInOut
 );
 
-int kapheinGeom3dAabbGetMinimumPoint(
-    const struct kapheinGeom3dAabb *aabb
-    , struct kapheinGeom3dVector3 *minOut
+enum kaphein_ErrorCode
+kaphein_geom3d_Aabb_getMinimumPoint(
+    const struct kaphein_geom3d_Aabb *aabb
+    , struct kaphein_geom3d_Vector3 *minOut
 );
 
-int kapheinGeom3dAabbGetMaximumPoint(
-    const struct kapheinGeom3dAabb *aabb
-    , struct kapheinGeom3dVector3 *maxOut
+enum kaphein_ErrorCode
+kaphein_geom3d_Aabb_getMaximumPoint(
+    const struct kaphein_geom3d_Aabb *aabb
+    , struct kaphein_geom3d_Vector3 *maxOut
 );
 
-int kapheinGeom3dAabbGetSupportingPoint(
+enum kaphein_ErrorCode
+kaphein_geom3d_Aabb_getSupportingPoint(
     const void *aabb
-    , const struct kapheinGeom3dVector3 *direction
-    ,  struct kapheinGeom3dVector3 *pointOut
+    , const struct kaphein_geom3d_Vector3 *direction
+    ,  struct kaphein_geom3d_Vector3 *pointOut
 );
 
 #endif
